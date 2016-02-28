@@ -1,0 +1,905 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Saman Barghi</title>
+    <link>http://samanbarghi.com/</link>
+    <description>Recent content on Saman Barghi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 08 Dec 2015 02:09:03 -0500</lastBuildDate>
+    <atom:link href="http://samanbarghi.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>About</title>
+      <link>http://samanbarghi.com/about/</link>
+      <pubDate>Tue, 08 Dec 2015 02:09:03 -0500</pubDate>
+      
+      <guid>http://samanbarghi.com/about/</guid>
+      <description>&lt;p&gt;&lt;img class=&#34;alignleft&#34; style=&#34;margin-right: 30px;margin-bottom: 20px;&#34; title=&#34;Saman Barghi&#34; alt=&#34;Saman Barghi&#34; src=&#34;http://samanbarghi.com/images/saman_handstand.jpg&#34; width=&#34;300&#34;  align=&#34;left&#34; /&gt;
+Saman Barghi is currently a PhD student of Computer Science at University of Waterloo. He is currently researching on concurrent and parallel programming models, specially for highly scalable network servers. He is trying to find a sweet spot between thread-based programming model and event-driven model; this model will use various hardware characteristics and stage driven model to provide an scalable alternative to current available models. Currently, he is developing a user thread library in C++ that supports x86_64 machines and can provide a &lt;strong&gt;M:N&lt;/strong&gt; threading model on Linux.&lt;/p&gt;
+
+&lt;p&gt;He is also a full stack developer, interested in learning new technologies, and
+apply them to create interesting products. He believe that learning any new
+technology should not take more than a month to master, and believes investing
+time in choosing the right tools and come up with a good design in the beginning
+will translate to saving time in the future; if one do not get stuck
+in that process forever.&lt;/p&gt;
+
+&lt;p&gt;He is a calisthenics addict and dedicates some time in his schedule to build strength and reach
+his goals. He believes a healthy diet and following a workout routine to reach
+predefined goals will translate to developing strength, increasing health and
+energy and helping you stay sharp and focused. He is also and adventurer, love
+outdoors and nature.&lt;/p&gt;
+
+&lt;p&gt;Saman is always have a book close by, and is interested in subjects such as
+behavioural economics, business building, personal growth, how brain works and
+human interactions. He believes that not also gathering knowledge is essential to change your
+point of view towards the world around you and to shine some light on the dark corners
+of your mind, but also using his knowledge in day to day life towards
+creating a better environment for himself and other human beings is what should
+result from that knowledge. He is also interested in reading fiction, and
+believes a good fiction will make the reader think, and make him live the life
+of others and spend moments in their shoes, and will result in personal growth.&lt;/p&gt;
+
+&lt;p&gt;He is also play the guitar and paints with acrylic in his free time. He
+believes in building a skill set in one dimension (Computer Science), and occasionally touching other
+dimensions, specially art, to be able to view the world through that window. He
+always tries to keep an open mind regarding the subjects around him, and
+reevaluate his believes and ideas frequently.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>How to wrap a system call (libc function) in Linux</title>
+      <link>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</link>
+      <pubDate>Fri, 05 Sep 2014 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</guid>
+      <description>
+
+&lt;p&gt;For one of my research projects I had to wrap linux system calls and redirect
+them to another thread. In Linux system calls are not invoked directly, but
+rather via wrapper functions in
+glibc[&lt;a href=&#34;http://man7.org/linux/man-pages/man2/syscalls.2.html&#34;&gt;man 2 syscalls&lt;/a&gt;]. The glibc
+wrapper is only copying arguments and unique system call number to the registers
+where the kernel expects them, then trapping to kernel mode and setting the
+errno if the system call returns an error number [&lt;a href=&#34;http://man7.org/linux/man-pages/man2/intro.2.html&#34;&gt;man 2 intro&lt;/a&gt;].&lt;/p&gt;
+
+&lt;p&gt;It is possible to invoke system calls directly by using syscall [&lt;a href=&#34;http://man7.org/linux/man-pages/man2/syscall.2.html&#34;&gt;man 2 syscall&lt;/a&gt;]. But since most programs will rely on glibc functions for system calls, it will be enough to wrap those functions. There are two ways to wrap or override C functions in Linux:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Using LD_PRELOAD:&lt;/strong&gt; There is a shell environment variable in Linux called
+&lt;em&gt;LD_PRELOAD&lt;/em&gt;, which can be set to a path of a shared library, and that library
+will be loaded before any other library (including glibc).&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Using &amp;lsquo;ld --wrap=&lt;em&gt;symbol&lt;/em&gt;&amp;lsquo;:&lt;/strong&gt; This can be used to use a wrapper function
+for &lt;em&gt;symbol&lt;/em&gt;. Any further reference to &lt;em&gt;symbol&lt;/em&gt; will be resolved to the
+wrapper function. [&lt;a href=&#34;http://man7.org/linux/man-pages/man1/ld.1.html&#34;&gt;man 1 ld&lt;/a&gt;].&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I explain each approach later, but first lets write a very simple test file.
+I plan to wrap &lt;em&gt;write&lt;/em&gt; system call and count the total number of characters that
+is being written out.&lt;/p&gt;
+
+&lt;h3 id=&#34;test-file:a3553a81da01374026bea81262624115&#34;&gt;Test file&lt;/h3&gt;
+
+&lt;p&gt;Lets write a very simple test file that calls &lt;em&gt;write&lt;/em&gt; and &lt;em&gt;printf&lt;/em&gt; to write to standard output:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;unistd.h&amp;gt;
+
+int main()
+{
+    write(0, &amp;quot;Hello, Kernel!\n&amp;quot;, 15);
+    printf(&amp;quot;Hello, World!\n&amp;quot;);
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If I run the code I get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./bin/test
+Hello, Kernel!
+Hello, World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now I want to see what are the system calls that are being called when running the test file. I use &lt;em&gt;strace&lt;/em&gt; to see the system calls responsible for writting to the standard output. &lt;em&gt;strace&lt;/em&gt; is being used to trace system calls and signals. Here is the result:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;execve(&amp;quot;./bin/test&amp;quot;, [&amp;quot;./bin/test&amp;quot;], [/* 53 vars */]) = 0
+brk(0)                                  = 0x2532000
+access(&amp;quot;/etc/ld.so.nohwcap&amp;quot;, F_OK)      = -1 ENOENT (No such file or directory)
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f099cc04000
+access(&amp;quot;/etc/ld.so.preload&amp;quot;, R_OK)      = -1 ENOENT (No such file or directory)
+open(&amp;quot;/etc/ld.so.cache&amp;quot;, O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=128624, ...}) = 0
+mmap(NULL, 128624, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f099cbe4000
+close(3)                                = 0
+access(&amp;quot;/etc/ld.so.nohwcap&amp;quot;, F_OK)      = -1 ENOENT (No such file or directory)
+open(&amp;quot;/lib/x86_64-linux-gnu/libc.so.6&amp;quot;, O_RDONLY|O_CLOEXEC) = 3
+read(3, &amp;quot;\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0&amp;gt;\0\1\0\0\0\320\37\2\0\0\0\0\0&amp;quot;..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=1845024, ...}) = 0
+mmap(NULL, 3953344, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f099c61e000
+mprotect(0x7f099c7d9000, 2097152, PROT_NONE) = 0
+mmap(0x7f099c9d9000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1bb000) = 0x7f099c9d9000
+mmap(0x7f099c9df000, 17088, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f099c9df000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f099cbe3000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f099cbe1000
+arch_prctl(ARCH_SET_FS, 0x7f099cbe1740) = 0
+mprotect(0x7f099c9d9000, 16384, PROT_READ) = 0
+mprotect(0x600000, 4096, PROT_READ)     = 0
+mprotect(0x7f099cc06000, 4096, PROT_READ) = 0
+munmap(0x7f099cbe4000, 128624)          = 0
+write(0, &amp;quot;Hello, Kernel!\n&amp;quot;, 15Hello, Kernel!)        = 15
+fstat(1, {st_mode=S_IFCHR|0620, st_rdev=makedev(136, 3), ...}) = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7f099cc03000
+write(1, &amp;quot;Hello, World!\n&amp;quot;, 14Hello, World!)         = 14
+exit_group(0)                           = ?
++++ exited with 0 +++
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;As you can see lines 26 and 29 are where the &lt;em&gt;write&lt;/em&gt; system call related to our
+code is being called. Since our goal is to wrap glibc functions, lets check
+output of &lt;em&gt;ltrace&lt;/em&gt; as well. &lt;em&gt;ltrace&lt;/em&gt; intercepts and records the dynamic library
+calls which are called by the executed process [&lt;a href=&#34;http://man7.org/linux/man-pages/man1/ltrace.1.html&#34;&gt;man 1 ltrace&lt;/a&gt;]. Here is the result:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;__libc_start_main(0x40057d, 1, 0x7fffdd1ec628, 0x4005b0 &amp;lt;unfinished ...&amp;gt;
+write(0, &amp;quot;Hello, Kernel!\n&amp;quot;, 15Hello, Kernel!
+)                                          = 15
+puts(&amp;quot;Hello, World!&amp;quot;Hello, World!)         = 14
++++ exited (status 0) +++
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;em&gt;ltrace&lt;/em&gt; result shows that the &lt;em&gt;write&lt;/em&gt; function in the code is calling the
+&lt;em&gt;write&lt;/em&gt; function from glibc, but &lt;em&gt;printf&lt;/em&gt; is calling &lt;em&gt;puts&lt;/em&gt; from glibc. So we
+should be careful here, overriding only the &lt;em&gt;write&lt;/em&gt; function from glibc will not
+cause the &lt;em&gt;write&lt;/em&gt; system call from &lt;em&gt;printf&lt;/em&gt; to be wrapped. We need to
+differentiate between the final system call and the glibc library call. So in
+order to cover both of the cases, I need to override &lt;em&gt;write&lt;/em&gt; and &lt;em&gt;puts&lt;/em&gt;
+functions. Now lets jump into wrapping these functions.&lt;/p&gt;
+
+&lt;h2 id=&#34;using-ld-preload:a3553a81da01374026bea81262624115&#34;&gt;Using LD_PRELOAD&lt;/h2&gt;
+
+&lt;p&gt;LD_PRELOAD allows a shared library to be loaded before any other libraries. So
+all I need to do is to write a shared library that overrides &lt;em&gt;write&lt;/em&gt; and &lt;em&gt;puts&lt;/em&gt;
+functions. If we wrap these functions, we need a way to call the real functions
+to perform the system call. &lt;em&gt;dlsym&lt;/em&gt; just do that for us [&lt;a href=&#34;http://man7.org/linux/man-pages/man3/dlsym.3.html&#34;&gt;man 3 dlsym&lt;/a&gt;]:
+&amp;gt; The function dlsym() takes a &amp;ldquo;handle&amp;rdquo; of a dynamic library returned
+       by dlopen() and the null-terminated symbol name, returning the
+       address where that symbol is loaded into memory.  If the symbol is
+       not found, in the specified library or any of the libraries that were
+       automatically loaded by dlopen() when that library was loaded,
+       dlsym() returns NULL&amp;hellip;&lt;/p&gt;
+
+&lt;p&gt;So inside the wrapper function we can use dlsym to get the address of the related symbol in memory and call the glibc function. Another approach can be calling the syscall directly, both approaches will work. Here is the code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#define _GNU_SOURCE
+#include &amp;lt;dlfcn.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+/* Function pointers to hold the value of the glibc functions */
+static  ssize_t (*real_write)(int fd, const void *buf, size_t count) = NULL;
+static int (*real_puts)(const char* str) = NULL;
+
+/* wrapping write function call */
+ssize_t write(int fd, const void *buf, size_t count)
+{
+
+    /* printing out the number of characters */
+    printf(&amp;quot;write:chars#:%lu\n&amp;quot;, count);
+    /* reslove the real write function from glibc
+     * and pass the arguments.
+     */
+    real_write = dlsym(RTLD_NEXT, &amp;quot;write&amp;quot;);
+    real_write(fd, buf, count);
+
+}
+
+int puts(const char* str)
+{
+
+    /* printing out the number of characters */
+    printf(&amp;quot;puts:chars#:%lu\n&amp;quot;, strlen(str));
+    /* resolve the real puts function from glibc
+     * and pass the arguments.
+     */
+    real_puts = dlsym(RTLD_NEXT, &amp;quot;puts&amp;quot;);
+    real_puts(str);
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We first declare pointers to hold the value of the glibc functions, we will use these later to get the pointer from &lt;em&gt;dlsym&lt;/em&gt;. Then we simply implement the glibc functions that we want to wrap, add our code and finally call the real function to perform the intended task.&lt;/p&gt;
+
+&lt;h4 id=&#34;compiling-the-shared-library:a3553a81da01374026bea81262624115&#34;&gt;Compiling the shared library&lt;/h4&gt;
+
+&lt;p&gt;We compile the shared library as follows:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gcc -fPIC -shared  -o bin/libpreload.so src/wrap-preload.c -ldl
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;We need to make sure we are generating a position-independent code(PIC) by passing &lt;code&gt;-fPIC&lt;/code&gt; that is shared &lt;code&gt;-shared&lt;/code&gt;. We also need to link our library with Dynamically Loaded (DL) libraries &lt;code&gt;-ldl&lt;/code&gt;, since we are using dlsym in our code.&lt;/p&gt;
+
+&lt;p&gt;To run our test code and wrap glibc functions, we simply set &lt;code&gt;LD_PRELOAD&lt;/code&gt; enviornment variable to the generated shared object file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ LD_PRELOAD=/home/saman/Programming/wrap-syscall/bin/libpreload.so ./bin/test
+write:chars#:15
+Hello, Kernel!
+puts:chars#:13
+Hello, World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;LD_PRELOAD&lt;/code&gt; loads the libpreload.so library before the execution of our code, and thus calling &lt;em&gt;write&lt;/em&gt; and &lt;em&gt;puts&lt;/em&gt; will call our wrapper functions inside the library.&lt;/p&gt;
+
+&lt;h2 id=&#34;using-ld-wrap-symbol:a3553a81da01374026bea81262624115&#34;&gt;Using &lt;em&gt;ld --wrap=symbol&lt;/em&gt;&lt;/h2&gt;
+
+&lt;p&gt;Another way of wrapping functions is by using linker at the link time. GNU linker provides an option to wrap a function for a symbol [&lt;a href=&#34;http://man7.org/linux/man-pages/man1/ld.1.html&#34;&gt;man 1 ld&lt;/a&gt;]:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;Use a wrapper function for symbol.  Any undefined reference to
+           symbol will be resolved to &amp;ldquo;&lt;strong&gt;wrap_symbol&amp;rdquo;.  Any undefined
+           reference to &amp;ldquo;&lt;/strong&gt;real_symbol&amp;rdquo; will be resolved to symbol.&lt;/p&gt;
+
+&lt;p&gt;This can be used to provide a wrapper for a system function.  The
+           wrapper function should be called &amp;ldquo;&lt;strong&gt;wrap_symbol&amp;rdquo;.  If it wishes
+           to call the system function, it should call &amp;ldquo;&lt;/strong&gt;real_symbol&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Here is a trivial example:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;   void *
+   __wrap_malloc (size_t c)
+   {
+    printf (&amp;quot;malloc called with %zu\n&amp;quot;, c);
+    return __real_malloc (c);
+   }
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you link other code with this file using &amp;ndash;wrap malloc, then
+    all calls to &amp;ldquo;malloc&amp;rdquo; will call the function &amp;ldquo;&lt;strong&gt;wrap_malloc&amp;rdquo;
+    instead.  The call to &amp;ldquo;&lt;/strong&gt;real_malloc&amp;rdquo; in &amp;ldquo;__wrap_malloc&amp;rdquo; will
+    call the real &amp;ldquo;malloc&amp;rdquo; function.&lt;/p&gt;
+
+&lt;p&gt;You may wish to provide a &amp;ldquo;&lt;strong&gt;real_malloc&amp;rdquo; function as well, so
+    that links without the &amp;ndash;wrap option will succeed.  If you do
+    this, you should not put the definition of &amp;ldquo;&lt;/strong&gt;real_malloc&amp;rdquo; in the
+    same file as &amp;ldquo;__wrap_malloc&amp;rdquo;; if you do, the assembler may
+    resolve the call before the linker has a chance to wrap it to
+    &amp;ldquo;malloc&amp;rdquo;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Based on the description, we need to implement two function &lt;code&gt;__real_symbol&lt;/code&gt; and &lt;code&gt;__wrap_symbol&lt;/code&gt; (in our case &lt;code&gt;__real_write&lt;/code&gt; and &lt;code&gt;__wrap_write&lt;/code&gt;), and link the application with our code. Here is the code:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;#include &amp;lt;stdio.h&amp;gt;
+#include &amp;lt;string.h&amp;gt;
+
+/* create pointers for real glibc functions */
+ssize_t __real_write(int fd, const void *buf, size_t count);
+int __real_puts(const char* str);
+
+
+/* wrapping write function */
+
+
+ssize_t __wrap_write (int fd, const void *buf, size_t count)
+{
+    /* printing out the number of characters */
+    printf(&amp;quot;write:chars#:%lu\n&amp;quot;, count);
+
+    /* call the real glibc function and return the result */
+    ssize_t result = __real_write(fd, buf, count);
+    return result;
+}
+
+/* wrapping puts function */
+int __wrap_puts (const char* str)
+{
+    /* printing out the number of characters */
+    printf(&amp;quot;puts:chars#:%lu\n&amp;quot;, strlen(str));
+
+    /* call the real glibc function and return the result */
+    int result = __real_puts(str);
+    return result;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The code is very straight forward, but now lets try to compile the code and link it with our test application.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;gcc -c src/wrap-link.c -o bin/wrap-link.o
+gcc -c src/test.c -o bin/test-link.o
+gcc -Wl,-wrap,write -Wl,-wrap=write -Wl,-wrap=puts bin/test-link.o bin/wrap-link.o -o bin/test-link-bin
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;I used &lt;em&gt;gcc&lt;/em&gt; to pass the option to the linker with &lt;code&gt;-Wl&lt;/code&gt;, which is equal to calling &lt;code&gt;ld&lt;/code&gt; with &lt;code&gt;--wrap&lt;/code&gt; option. Now if I run the code I get:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ./bin/test-link-bin
+write:chars#:15
+Hello, Kernel!
+puts:chars#:13
+Hello, World!
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h2 id=&#34;conclusion:a3553a81da01374026bea81262624115&#34;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;In order to wrap system calls in Linux, one have to wrap related glibc function calls. You have to be careful about the type of system calls you are tryting to override, since various functions might call different functions from glibc, e.g. &lt;em&gt;printf&lt;/em&gt; calls &lt;em&gt;puts&lt;/em&gt; from glibc which calls &lt;em&gt;write&lt;/em&gt; at the end.&lt;/p&gt;
+
+&lt;p&gt;There are two ways to do this: 1-Using &lt;code&gt;LD_PRELOAD&lt;/code&gt; environment variable, 2-using &lt;code&gt;ld --wrap&lt;/code&gt;. I personally prefer the first approach since if the number of wrapper functions increases I do not have to specify them one by one, as in the second case.&lt;/p&gt;
+
+&lt;p&gt;You can find the source code and the related Makefile in the following github repository: &lt;a href=&#34;wrap-syscall&#34;&gt;https://github.com/samanbarghi/wrap-syscall&lt;/a&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>National Geographic Photo of the day Downloader for Linux</title>
+      <link>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
+      <pubDate>Wed, 29 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
+      <description>
+
+&lt;p&gt;[&lt;img class=&#34;wp-image-252 alignleft&#34; title=&#34;National Geographic Photo Of the Day&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721-300x225.jpg&#34; alt=&#34;National Geographic Photo Of the Day&#34; width=&#34;300&#34; height=&#34;225&#34; /&gt;][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a title=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; target=&#34;_blank&#34;&gt;&lt;a href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34;&gt;https://github.com/samanbarghi/ngphotodownloader&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Although National Geographic posts a photo everyday, not all the photos come with a high quality format. So the script checks whether a wallpaper format exists or not. If so, it downloads the photo into the same directory the script resides.&lt;/p&gt;
+
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+
+&lt;h2 id=&#34;setup:2322363d5b3491b8421298be27f8697e&#34;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;All you need to do is  create a directory for your wallpaper and put the script in there, e.g.:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ~/Pictures/
+git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Simply run the script to get the Photo of the day. But doing that manually everyday is not fun. Here cron comes handy. You need to run the script at least once each day, to automate the process you can use cron to download the script and set it as your desktop background:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;0 12 * * * sh /home/yourusername/Pictures/NGWallpapers/ngwallpaper.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In my case since I am running the script on my laptop, and my laptop is not always on; I call the script every 3 hours to make sure it runs at least once each day. Don&amp;#8217;t worry about duplicates, the script will not download the image if it already exists in the directory. The overhead of the script on cpu/memory/network is negligible, so don&amp;#8217;t worry about calling the script 8 times a day:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;00 */3 * * * sh /home/yourusername/Pictures/NGWallpapers/ngwallpaper.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Enjoy! &lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>What Might My Resume look Like If I Were a Computer !?</title>
+      <link>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</link>
+      <pubDate>Mon, 21 May 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
+      <description>
+
+&lt;p&gt;The other day I was about to update my resume, and this crazy question came to my mind:&lt;br /&gt;
+&lt;strong&gt;What might my resume look like if I were a computer ?&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;And &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am Computer&#34;&gt;This was the result.&lt;/a&gt; (Best viewed in Chrome and Firefox, if I turn to a computer I will run Unix based systems and IE does not exist in my world).&lt;/p&gt;
+
+&lt;p&gt;Well, I am aware that I would not wake up one morning finding out I turned into a computer. Also, I am not sure if one day I turn into a computer, I would look for a job. It is not unexpected that someday robots apply for jobs:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;I am an intel-based robot with 128 cores, 2 extra GPUs and lots and lots of storage. Great at multi-tasking, equipped with state of the art AI technologies; can adapt to any environment and a quick learner. I also have teleportation abilities, but the module is missing so you have to buy the module and train me to do that. Originally designed to compose and play music, but I also can cook, clean and do programming.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&#34;here-is-how-i-came-up-with-me-as-a-computer-resume-2:4b9a2f0cc21d2fa557cbbde11ed224e0&#34;&gt;Here is how I came up with &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am a Computer&#34;&gt;me as a computer resume&lt;/a&gt;:&lt;/h2&gt;
+
+&lt;p&gt;Lets see how a computer do it&amp;#8217;s job from inside out. In the heart of the computer, there lays CPU which does most of the hard work and it defines the base characteristics of the system. Frequency, Processing units, Registers, Memory management, and etc. If I were a computer, I would ask myself: What are my core features that are defining my characteristics? In human world, it translates to very basic human characteristics and personality. Being a team player, public speaker, GTD type of person, Introvert, active, passive, and so on. Basically, I question the way I define myself. This will be the core of the system.&lt;/p&gt;
+
+&lt;p&gt;In addition, one important part of the computer systems is the &lt;a href=&#34;http://en.wikipedia.org/wiki/Memory_hierarchy&#34;&gt;memory hierarchy&lt;/a&gt;. to simplify things, lets assume memory hierarchy only consists of Hard Drive, RAM and processor caches (L1, L2 and L3) . Each core has access to all these memory elements, and the difference is the time it takes for the core to access each of them. At the very top of the hierarchy we have Level 1 Cache (L1), which has a very fast access time but it comes in very small size. As we move down the hierarchy (L2 -&amp;gt; L3 -&amp;gt; RAM), the access time gets longer and the size of the memory becomes bigger. It means the lower the memory element is in the hierarchy, the more time CPU has to spend to fetch the data from that element.&lt;/p&gt;
+
+&lt;p&gt;[&lt;img src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi-300x260.gif&#34; alt=&#34;&#34; title=&#34;mem_hi&#34; width=&#34;300&#34; height=&#34;260&#34; class=&#34;aligncenter size-medium wp-image-228&#34; style=&#34;margin:auto&#34; /&gt;][4]&lt;br /&gt;
+But how does this all work together? Well there is a concept called temporal locality (also there exists Spatial Locality which is not related to me being a computer !!), it means the most recent data being used at a certain point in time should be closer to the core of the system. Because this data will most probably be used in the near future. So recently used data can be accessed faster, and since most probably it will be accessed in the near future again, it makes the system works faster by removing the accessing cost to that data. For it to work, the CPU moves the data it needs to access at a certain point in time from RAM to each cache level based on recency of the data. So data in L1 is being served at the moment, and data in L3 has been accessed a while ago.&lt;/p&gt;
+
+&lt;p&gt;If we look closely, the same concept applies in our lives. In my case, there are skills and programming languages which I am actively using right now in various projects. The cost of accessing those skills for me is almost zero (My L1 cache as a computer). However, there are a couple of programming languages and technologies that I am using along with L1 skills and they are being accessed frequently as well. The cost to activate those skills is very small but not zero. There are also some programming languages I used during the past years, or I have played with them a while ago, and the price of activating them for me will be to read some documents, write some sample programs and it takes time for me to get comfortable with them again. Those stuff fits into my L3 cache. RAM normally holds the data related to the processes running in a CPU, and in human world I translate them to the general skills that are in there and can be loaded to caches anytime. Web development, mobile app development, these are general info that float in my RAM ! I talk about the hard drive in a bit.&lt;/p&gt;
+
+&lt;p&gt;Well of course without the mainboard, all of these are nothing. CPU and RAM attach to the mainboard, and the mainboard provides the connectors for various parts. It connects the CPU to RAM, Hard Drive and all other devices. CPU also gets all its power from the mainboard. Mainboard basically provides support for the rest of the system. In human world, we can ask ourselves, which one of our features provides support for what we already put in our CPU and Memory? My answer was: achievements. Achievements can be education, work experiences, projects, and awards. These achievements connects the person who is reviewing our resume to the skills in our memory, or personality in our CPU.&lt;/p&gt;
+
+&lt;p&gt;Another device that attaches to the mainboard, is hard drive. Hard drive is for storing a whole bunch of data, and it&amp;#8217;s external to the mainboard. Photos, Videos, Documents and programs reside in the Hard Drive. There are various types of data in the hard-drive, but not all are related to the job I (as a computer) am applying for. The whole system has already loaded what is required for a job in the RAM and caches. What left is all other none-related data, which can be loaded at the times I am not applying for jobs or doing a job ! In human world, I say all the interests, hobbies, and activities that are not related to their jobs are stored in the hard drive. Although, this is not related to the job itself, but it can demonstrate how interesting a person is.&lt;/p&gt;
+
+&lt;p&gt;I applied the rules above to myself and came up with &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am a Computer&#34;&gt;me as a computer resume&lt;/a&gt;. If someone take a look at this resume, by one look they know if they are interested in what I am doing or not. So the real question is not whether one day I turn into a computer or not, it is why in 21st century most resumes are still flat lists and lack a specific hierarchy? I would be bored looking at hundreds of flat listed resumes each having pages and pages of information, I would be happy to hear from other peoples&amp;#8217;s point of view? Although there are some really creative resume designs out there, what would be your suggestion to change the way most people present their resume !? What would your resume look like if you wanted to think out of the box!? What type of info helps HR and hiring staff evaluate a resume better? is there any research going on this subject?&lt;/p&gt;
+
+&lt;p&gt;[4]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi.gif&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi.gif&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Mercurial on Bluehost</title>
+      <link>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</link>
+      <pubDate>Fri, 26 Aug 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</guid>
+      <description>&lt;p style=&#34;text-align: left;&#34;&gt;
+  I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions available (&lt;a href=&#34;http://bugtracker.gttools.com/public/wiki/bluehost/Mercurial&#34;&gt;this&lt;/a&gt; and &lt;a href=&#34;http://gttools.com/bluehost-setup/mercurial-and-trac-setup-on-bluehost&#34;&gt;this&lt;/a&gt;). But they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost):
+&lt;/p&gt;
+
+&lt;p style=&#34;text-align: left;&#34;&gt;
+  &amp;nbsp;
+&lt;/p&gt;
+
+&lt;p style=&#34;text-align: left;&#34;&gt;
+  &lt;span style=&#34;text-align: -webkit-auto;&#34;&gt;Update your bash profile, add/modify these 3 lines:&lt;/span&gt;
+&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;vim ~/.bash_profile
+export LD_LIBRARY_PATH=”$HOME/packages/lib:$LD_LIBRARY_PATH”
+export PYTHONPATH=”$HOME/packages/lib/python2.3/site-packages:$PYTHONPATH”
+export PATH=”$HOME/packages/bin:$HOME/bin:$PATH”
+source ~/.bash_profile
+vim ~/.bashrc
+PATH=$PATH:$HOME/bin:$HOME/packages/mercurial
+source ~/.bashrc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create folders (Please note, from now on my assumption is that your web directory is located at $HOME/public_html, please change the related parts if your configuration is different):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd
+mkdir install_files
+mkdir packages
+mkdir ~/public_html/hg
+mkdir ~/public_html/hg/repos
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Get Mercurial and install:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ~/packages
+wget http://selenic.com/repo/hg-stable/archive/tip.tar.gz
+tar zxf tip.tar.gz
+mv tip.tar.gz ~/install_files/
+mv Mercurial* mercurial
+cd mercurial
+#dont&#39; forget to change the username
+echo -e &amp;quot;[ui]\nusername=YOURUSERNAME &amp;amp;lt;YOUREMAIL@WEB.com&amp;amp;gt;&amp;quot; &amp;amp;gt; ~/.hgrc﻿
+make local
+./hg debuginstall
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Running the last command should not show any problems and you would see :&lt;span style=&#34;font-family: Consolas, Monaco, &#39;Courier New&#39;, Courier, monospace; font-size: 12px; line-height: 18px; white-space: pre;&#34;&gt; &lt;/span&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;Checking encoding (UTF-8)...
+Checking installed modules (~/packages/mercurial/mercurial)...
+Checking templates...
+Checking commit editor...
+Checking username...
+No problems detected
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to be able to push, mercurial provides a cgi script(hgweb.cgi) to handle push commands (&lt;a href=&#34;http://mercurial.selenic.com/wiki/PublishingRepositories#hgweb&#34;&gt;http://mercurial.selenic.com/wiki/PublishingRepositories#hgweb&lt;/a&gt;). In addition, there is a need for apache authentication module to perform the authentication tasks and manage accesses to our repository. Before, we can use the repository we need to copy the hgweb.cgi script to our web directory, and customize it afterwards:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;sed &#39;s|#import sys|import sys|g;s|/path/to/python/lib|&#39;$HOME&#39;/packages/mercurial|g;s|/path/to/repo/or/config|&#39;$HOME&#39;/public_html/hg/hgweb.config|g&#39; ~/packages/mercurial/hgweb.cgi &amp;amp;gt; $HOME/public_html/hg/hgweb.cgi
+chmod 755 ~/public_html/hg/hgweb.cgi
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create hgweb.config file. You can use *[collections] *instead of &lt;em&gt;[paths]&lt;/em&gt; here, it depends on your personal taste. [Here][1] suggested to use paths instead of collection. So if you prefer to use &lt;em&gt;[collections]&lt;/em&gt; instead, do not forget to remove all the lines related to hgweb.config when you initialize your repository:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo [web] &amp;amp;gt; ~/public_html/hg/hgweb.config
+echo allowpull=true &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
+echo [paths] &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create .htaccess file:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo &#39;Options +ExecCGI&#39; &amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteEngine On&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteBase /hg&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteRule ^$ hgweb.cgi [L]&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteCond %{REQUEST_FILENAME} !-f&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteCond %{REQUEST_FILENAME} !-d&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;RewriteRule (.*) hgweb.cgi/$1 [QSA,L]&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;AuthUserFile /home/&#39;$USER&#39;/etc/hg-basic-auth&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;AuthName &amp;quot;HG Repositories&amp;quot;&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;AuthType Basic&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+echo &#39;Require valid-user&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Create Passwd files:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd
+htpasswd -b -c -d ~/etc/hg-basic-auth HgUserName PASSWORD
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For extra users:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;htpasswd -b -d ~/etc/hg-basic-auth HgUserNameExtra PASSWORD
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Initialize repositories (Do not forget to change all instances of PROJECT to your own project name):&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ~/public_html/hg/repos
+~/packages/mercurial/hg init PROJECT
+echo &#39;PROJECT = &#39;$HOME&#39;/public_html/hg/repos/PROJECT&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;For extra projects :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;~/packages/mercurial/hg init ExtraPROJECT
+echo &#39;ExtraPROJECT  = &#39;$HOME&#39;/public_html/hg/repos/ExtraPROJECT&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Now lets create hgrc files for each project :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo &#39;[web]&#39; &amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
+echo &#39;contact=admin email address&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
+echo &#39;description=My releases&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
+echo &#39;allow_push=USER1, USERn&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
+echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;By default, pushing is only allowed via HTTPS. To permit HTTP pushing you have to add this to your repository&amp;#8217;s &lt;tt&gt;.hg/hgrc&lt;/tt&gt; file (or your Web server user&amp;#8217;s &lt;tt&gt;.hgrc&lt;/tt&gt; file, such as&lt;tt&gt;/home/www-data/.hgrc&lt;/tt&gt;, or a system-wide &lt;tt&gt;hgrc&lt;/tt&gt; file like &lt;tt&gt;/etc/mercurial/hgrc&lt;/tt&gt;):&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;I personally decided to put this in the hgrc file in my repository:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;echo &#39;push_ssl = false&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hgrc
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;You are basically done. You can access your repository using :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;hg clone http://yourdomain.com/hg/PROJECT
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;[1]: &lt;a href=&#34;http://mercurial.selenic.com/wiki/PublishingRepositories#Configuration_of_hgweb&#34;&gt;http://mercurial.selenic.com/wiki/PublishingRepositories#Configuration_of_hgweb&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SSH to VirtualBox 3 FreeBsd Guests</title>
+      <link>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
+      <pubDate>Fri, 04 Feb 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
+      <description>&lt;p&gt;This post is based on &lt;a href=&#34;http://muffinresearch.co.uk/archives/2010/02/08/howto-ssh-into-virtualbox-3-linux-guests/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Howto: SSH into VirtualBox 3 Linux Guests&amp;#8221;&lt;/a&gt; by &lt;a href=&#34;http://muffinresearch.co.uk/&#34; target=&#34;_blank&#34;&gt;Stuart Colville&lt;/a&gt;, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.&lt;/p&gt;
+
+&lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;
+
+&lt;p&gt;[&lt;img class=&#34;size-full wp-image-143 alignnone&#34; title=&#34;VirtualBox-FreeBsd&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34; alt=&#34;&#34; width=&#34;501&#34; height=&#34;397&#34; /&gt;][1]&lt;/p&gt;
+
+&lt;p&gt;Now if you do &lt;em&gt;ifconfing&lt;/em&gt; on your host machine (On Windows hosts use &lt;em&gt;ipconfig&lt;/em&gt;), there will be a new interface called *vboxnet0 *(same as the virtual adapter name you just added). You will notice the IP address is something similar to this:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;inet addr:192.168.56.1  Bcast:192.168.56.255  Mask:255.255.255.0&lt;/pre&gt;
+
+&lt;p&gt;Which means his interface can access all the IP addresses in the following range: &lt;em&gt;192.168.56.1-192.168.56.254&lt;/em&gt;. This is needed to setup the guest interface properly.&lt;/p&gt;
+
+&lt;p&gt;Now, boot the FreeBsd guest. If you do *ifconfig &lt;em&gt;on your guest machine&lt;/em&gt;, *You will notice that a second interface has been added to your machine (The name is *em1 *if you already had one interface). You have to configure the new interface; so you can access it by your host machine. We will set a static IP address for this interface using the IP range above.&lt;/p&gt;
+
+&lt;p&gt;Next add the following lines to &lt;em&gt;&amp;#8220;/etc/rc.conf&amp;#8221;&lt;/em&gt; in your guest machine:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;ifconfig_em1=&#34;inet 192.168.56.10 netmask 255.255.255.0&#34;
+&lt;/pre&gt;
+
+&lt;p&gt;Save this and run the following command to restart the network interfaces:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/etc/rc.d/netif restart &lt;/pre&gt;
+
+&lt;p&gt;If you have not enabled SSH on your FreeBsd guest yet, edit &lt;em&gt;/etc/rc.conf&lt;/em&gt; and add the following:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;sshd_enable=&#34;YES&#34; &lt;/pre&gt;
+
+&lt;p&gt;and then run:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/etc/rc.d/sshd start &lt;/pre&gt;
+
+&lt;p&gt;That&amp;#8217;s it, now you should be able to ssh to your guest machine by:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;ssh saman@192.168.56.10 &lt;/pre&gt;
+
+&lt;p&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Some Notes on Facebook Hacker Cup Qualification Round</title>
+      <link>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
+      <description>&lt;p&gt;Monday, January 10 was the last day to submit your answers to get qualified for Facebook Hacker Cup. It started from January 7, and lasted for 3 days. There were three problems presented on the competition website, to be solved by participants. Problems were provided with sample input and output, and there were no time limits to browse through the problems and to develop your code. To answer each problem, competitors had to download an input and submit their output, yet they only had 6 minutes, after they downloaded the input, to submit their answers through the form provided. There were absolutely no limitations on choosing the programming language (I used Perl), nor on the way you code your solution, cause there were no need to upload your source code. All three problems were fairly easy to solve, except one (called the peg game), that was not explained clearly. Anyone who solve at least one problem, would be qualified for the first round.&lt;/p&gt;
+
+&lt;p&gt;This competition could attract a fairly large number of young people around the world, and by that means, it can be counted as a success. Nevertheless, there were some fundamental design problems regarding the competition website itself, which is the topic of this post. These are some of the points that came into my mind:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;First of all, the rules and regulations of the competition, and the instructions were not presented clearly. Everything was distributed, and there were no centralized approach For instance, one had to register for this round through the event page that was created for this purpose. There was a link in the event description, that  could be used to register. when the event started, additional link were added to the same place which was pointing people to the qualification problem page. I was expecting to see the instructions in the new page and after reading all, I could not find out how I should submit my answers. Thus, I decided to open one problem and after reading that I thought maybe I have to download the input to get the instructions !!! After doing that, I opened the file and could just see some numbers in there. So, I decided to go back to the problem page and all of a sudden I saw the time is counting down. Then I went back to the event page and found out that instructions were added to the event description, under the registration link, and it was also could not be seen unless you click on *&amp;#8220;see more&amp;#8221; *to view the instructions. In addition, news and updates were being posted on another page (Hacker Cup page), and in the last day it seems they took off the  6 minute limit, but I again I failed to get updated, as I did not know such things were going on in a separate page.&lt;/li&gt;
+&lt;li&gt;The second issue was related to 6 minute limit for submitting the answers. I agree that there should be some mechanisms that make sure solutions are in the range that designers expect, but in this case it was a very bad idea to control the solutions by a timer. What designers might have thought is that if the code is well-written enough, even if program fails once or twice, well, there should be still enough time for people to run their code and copy-paste the answer. At first glance it seems fair, but they failed to take other parameters into consideration. If people were using same computers with same internet connection, and of course same browsers (it seems chrome had some problems with downloading the input file), and under same circumstances it could be considered as fair. What if someone do not have access to broadband or the connection drops frequently !? Or someone has access to a very powerful computer system which despite any bad coding styles could deliver the answer in less than the amount of time provided ?! My own problem was the &amp;#8220;Peg&amp;#8217;s game&amp;#8221; input, it was big for Putty to handle, so it freeze twice (I was coding on another machine through SSH). Then I had to  start the FTP service, upload the file via FTP, and voila 6 minutes passed !&lt;/li&gt;
+&lt;li&gt;The other problem was related to the explanation of the &amp;#8220;Peg&amp;#8217;s game&amp;#8221;. I think it was the most awful description I&amp;#8217;ve ever read in my life. The problem was a piece of cake when one fully understands it. But I think the main challenge here was understanding it. It took me a while to decrypt what was the real purpose of the question and how everything is connected together. I thought maybe it&amp;#8217;s me, and I did search today in order to see if others had any concerns about this problem. As I started to search, I found tons of different interpretations of the problem. So it seems that the designer failed to explain the problem clearly. I think it is related to the *Curse of Knowledge *(Refer to Made to Stick), which claims that the more you know about a subject the less you could know how it feels not knowing about that subject. It probably happened to you too, trying to explain something which seems obvious to you but others cannot understand a thing you are saying.&lt;/li&gt;
+&lt;li&gt;The last issue is the name of the competition does not match the content of it. They call it a hacker cup, though there were nothing to hack here, just simple programming questions. I took part in &lt;a title=&#34;HackU&#34; href=&#34;http://developer.yahoo.com/hacku/&#34; target=&#34;_blank&#34;&gt;Yahoo! HackU&lt;/a&gt; last year in University of Waterloo, and it was closer to a hacking competition than this competition. HackU is about using various tools to come up with a neat idea that blow judge&amp;#8217;s mind. I hope next rounds get closer to hacking idea than solving problems. Current situation seems more like Facebook is saying: &amp;#8220;Interviewing this amount of programmers is gonna take a lot of time, we prefer to make a competition online to select our programmers among them. And it&amp;#8217;s a better way cause people have to prove themselves&amp;#8221;. Which is absolutely fine, ( I think all the competitions are all about this), but the only hacking was to hack designers&amp;#8217; mind and the website to get the instructions and understand the problems.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In general, it is a very good move from Facebook to gather all this people to compete against each other and express their opinions. I Specially liked the way people could express their opinions on the event wall, there were lots of interesting posts, and most of them could be counted as a feedback ( Which was effective at least for taking off the time limit). I hope in the next round, geeks do not design the website, and get help from more experienced people in this area to take all the basic requirements into considerations.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;Some Notes on Facebook Hacker Cup Qualification Round&#39; st_url=&#39;http://www.samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The Power of Free</title>
+      <link>http://samanbarghi.com/2010/07/13/the-power-of-free</link>
+      <pubDate>Tue, 13 Jul 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2010/07/13/the-power-of-free</guid>
+      <description>&lt;p&gt;I am no coffee drinker, I prefer green tea and herbal tea over coffee. I rarely break this habit, only if I am too sleepy or really crave coffee. But once I was in a gathering in Davis Center (at University of Waterloo) and they were offering free coffee and donuts. All of a sudden I found myself socializing and drinking coffee without having any good reason for breaking my habit, I could not justify my behavior at the time. After giving some thoughts to the matter, I came up with two reasons to justify this behavior; either that was the effect of the coffee being free, or the socializing effect; I wanted to be like others. Now there are two questions to be asked:&lt;/p&gt;
+
+&lt;p&gt;The first question is: is all the stuff that are being offered to you for free, are actually free? What are the hidden costs of free stuff for you? How much are you paying (mentally and physically) to get something that worth nothing (money wise)? Dan Ariely describe and [experiment ][1] that he runs about free ice cream in his blog. He claims that free stuff are not actually free, cause for example you are investing your time in the line to get an ice cream that worth $1.45. But is that the only price you are paying? What about an overweight person who is on a diet and happened to pass by Ben &amp;amp; Jerry, and decides to get one ice-cream cause it&amp;#8217;s free? (Yeah will power is effective here, but sometimes FREE is more tempting than anything else)&lt;/p&gt;
+
+&lt;p&gt;There are other situations rather than free ice-cream, such as free shampoos given away, shavers, &amp;#8230;. In all these cases they are changing your mentality towards their company. Now your unconscious might tend to make you believe that this company is generous and you might want to do them a favor back in the future and buy their products later, and become a loyal costumer. Most of the companies are smarter and try to make you dependent on their products, think about all the blades you bought from a certain company because you got the razor for free! These are all hidden costs of free stuff which are not obvious in the first place.&lt;/p&gt;
+
+&lt;p&gt;The second question to be asked is: how much are you willing to sacrifice to be part of a group? How many values are you going to destroy to be mentally close to the ones who are around you? Again this is related to will power, to hold on to your values and what you believe-in, even when others around you are making you feel bad about it. We are all seeking for approval from other people, that&amp;#8217;s why we try to look like others. Nevertheless, what is the life you are seeing in front of you? The one you take control of it or the one others control for you?&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;The Power of Free&#39; st_url=&#39;http://www.samanbarghi.com/2010/07/13/the-power-of-free/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+
+&lt;p&gt;[1]: &lt;a href=&#34;http://danariely.com/2008/02/29/free-2/&#34;&gt;http://danariely.com/2008/02/29/free-2/&lt;/a&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Rationality</title>
+      <link>http://samanbarghi.com/2010/04/12/rationality</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2010/04/12/rationality</guid>
+      <description>&lt;p&gt;There are moments in life when you have to make a big decision, however, your emotions and ego block your mind. You cannot think clearly, and you see everything the way you want them to be, but the reality is on the exact opposite side. If you just rely on yourself and float in your thoughts, you are gonna drown at the very bottom of these thoughts. There is no way out of your doubts and uncertainty, it either makes you go crazy or  never let you get in touch with reality.&lt;/p&gt;
+
+&lt;p&gt;You are trapped in a box created by you, and you cannot see out of the box, all you need is to break the wall and see outside of the box. But not everybody is strong enough to overcome their fears of what they are about to see and embrace the reality. These are the exact moments that friends were created for, you need someone that sees outside the box. If you consult the situation with someone else, someone you trust, you can see through his eyes and step by step see the light of reality.&lt;/p&gt;
+
+&lt;p&gt;A very familiar example is a broken relationship. I have seen many people get emotional when the other person leaves them or cheat on them after they have been in a relationship for a while. They do not want to believe that either the other side does not want them, or they cannot trust the other side anymore. They see through the eyes of their memories and all the good moments they had together. The first thing they do is not letting the other side go, as the low self-confidence created by the rejection makes them hold on to that person harder. It gets harder and harder for them to believe the other side is cheated on them or does not want them, what they want to believe is that everything is back to normal and they can fix things. They tend to believe every lies that the other side is telling them, they can be easily played. They can survive if a friend come to the scene and open their eyes to their reality, it feels awful but they have to do what has to be done.&lt;/p&gt;
+
+&lt;p&gt;The main question here is how to detect these moments ? How to stay in touch with reality all the time and keep emotions away? What should you do after you detected you trapped in a box? how can you see outside of the box with your own power and without getting any help from someone else? What will be the possible practice to strengthen this ability?&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;EDIT:&lt;/strong&gt; It seems that this issue is more serious than I thought: &lt;a href=&#34;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&#34;&gt;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>See ID</title>
+      <link>http://samanbarghi.com/2010/04/12/see-id</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2010/04/12/see-id</guid>
+      <description>&lt;p&gt;I used to be asked to show my ID every time  I was paying by my credit card, and yes you are right, I did not sign the back of my credit card (That is how it works in Canada, they are taking it to the next level for entering a PIN number though). Today I was asked to show my ID again, but I noticed  no one has asked me to show my ID for last two months. Surprisingly, I could successfully stop ID checks without signing the back of my credit card. You are probably confused, but it is not that complicated. Instead of signing the back, I simply wrote &amp;#8220;&lt;strong&gt;&lt;em&gt;See ID&lt;/em&gt;&lt;/strong&gt;&amp;#8221; on the signature area. It was supposed to make cashiers to ask more about my ID, but to my surprise it worked the other way !&lt;/p&gt;
+
+&lt;p&gt;Does anyone has a rational explanation for the fake trust created by writing such a sentence? The first question I asked myself was  if the sentence created some sort of trust, or it is just because people do not like to do what they are told to do. What makes people more trustful when you directly tell them what you expect them to do!? I will start to do some research to find a proper answer to my question.&lt;/p&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;See ID&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/see-id/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SPDY installation</title>
+      <link>http://samanbarghi.com/2010/03/31/spdy-installation</link>
+      <pubDate>Wed, 31 Mar 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2010/03/31/spdy-installation</guid>
+      <description>
+
+&lt;p&gt;I am taking a course called &amp;#8220;Latency in Communication Systems&amp;#8221; taught by &lt;a href=&#34;http://www.cs.uwaterloo.ca/~mkarsten/&#34; target=&#34;_blank&#34;&gt;Martin Karsten&lt;/a&gt; in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate &lt;a title=&#34;SPDY&#34; href=&#34;http://www.chromium.org/spdy&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;SPDY&lt;/strong&gt;&lt;/a&gt;. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it&amp;#8217;s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.&lt;/p&gt;
+
+&lt;h2 id=&#34;install-chromium:9b6dd0bb85defcc32bbe025166e81019&#34;&gt;Install Chromium&lt;/h2&gt;
+
+&lt;p&gt;Edit: Follow the build instruction for linux here: &lt;a href=&#34;http://code.google.com/p/chromium/wiki/LinuxBuildInstructions&#34;&gt;http://code.google.com/p/chromium/wiki/LinuxBuildInstructions&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;I started to compile chromium on Ubuntu Karmic Koala 9.10. The obvious place to start is the &lt;a title=&#34;Chromium&#34; href=&#34;http://dev.chromium.org/&#34; target=&#34;_blank&#34;&gt;chromium website&lt;/a&gt;, Although take a look at &lt;a title=&#34;Cache data for SPDY server&#34; href=&#34;http://groups.google.com/group/spdy-dev/browse_thread/thread/16e0a9d5592ca908&#34; target=&#34;_blank&#34;&gt;this&lt;/a&gt;, we need to enable data recording to cache some data for the in-memory server, I will explain this later. These are the required step to take :&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Install all the &lt;a title=&#34;Chromium Ubuntu prerequisites&#34; href=&#34;http://code.google.com/p/chromium/wiki/LinuxBuildInstructionsPrerequisites#Ubuntu_Setup&#34; target=&#34;_blank&#34;&gt;prerequisites&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Download the source tarball from &lt;a title=&#34;Chromium Source tarball&#34; href=&#34;http://build.chromium.org/buildbot/archives/chromium_tarball.html&#34; target=&#34;_blank&#34;&gt;here&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Extract it to a location (It should not include any spaces). I extracted it to &lt;tt&gt;~/chromium&lt;/tt&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Install depot_tools&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;svn co http://src.chromium.org/svn/trunk/tools/depot_tools &lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Add depot_tools to your PATH: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;$ export PATH=&lt;code&gt;pwd&lt;/code&gt;/depot_tools:&amp;ldquo;$PATH&amp;rdquo; &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Updating your checkout once by running &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;gclient sync &amp;ndash;force &lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;span style=&#34;font-family: arial,sans-serif;&#34;&gt; in the source code directory (~/chromium/src). It is important to include the &amp;#8216;&amp;#8211;force&amp;#8217; option as I was getting this message: &lt;/span&gt;&lt;/p&gt;
+
+&lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py&#39;, needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c&#39;. Stop.&#34; &lt;/pre&gt;
+
+&lt;p&gt;&lt;span style=&#34;font-family: arial,sans-serif;&#34;&gt;over and over again since I forgot to include the &lt;tt&gt;&amp;ndash;force&lt;/tt&gt; option. It seems that this command generate platform-specific files&lt;/span&gt;&lt;/li&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt; ensure that you have &lt;tt&gt;GYP_GENERATORS=make&lt;/tt&gt; in your environment before running &lt;tt&gt;gclient sync&lt;/tt&gt; or &lt;tt&gt;gclient runhooks &amp;ndash;force&lt;/tt&gt;. This tells the Chromium build system to output Makefiles. Example: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;export GYP_GENERATORS=make
+gclient sync&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Take this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file &lt;tt&gt;chrome/common/chrome_constants.cc &lt;/tt&gt;- change the line which reads &lt;pre class=&#34;brush: cpp; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;kRecordModeEnabled = false&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;to&lt;/p&gt;
+
+&lt;pre class=&#34;brush: cpp; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;kRecordModeEnabled = true&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Go to the source directory and write (if you are using a multiple-core machine use &lt;tt&gt;-jX&lt;/tt&gt;, where &lt;tt&gt;X&lt;/tt&gt; is the number of make processes to startup): &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make chrome &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You can find the executable in &lt;tt&gt;src/out/Debug/chrome&lt;/tt&gt;&lt;/ol&gt;
+Now you should be able to run chrome with no problem.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&#34;install-flip-server:9b6dd0bb85defcc32bbe025166e81019&#34;&gt;Install flip-server&lt;/h2&gt;
+
+&lt;p&gt;To install flip-server, take a look at &lt;a title=&#34;Flip server installation&#34; href=&#34;http://www.chromium.org/spdy/running_flipinmemserver&#34; target=&#34;_blank&#34;&gt;this&lt;/a&gt;. Go to the Chromuim &lt;tt&gt;src&lt;/tt&gt; directory, and here are the steps that I took to install flip server:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;If you don&amp;#8217;t already have a test key.pem and certificate.pem, you can generate one like so: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;openssl genrsa -out key.pem 1024
+openssl req -new -key key.pem -out request.pem  #and answer the questions at the prompt with whatever
+openssl x509 -req -days 30 -in request.pem -signkey key.pem -out cert.pem&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Get the patch from: &lt;a href=&#34;http://codereview.chromium.org/1566013&#34;&gt;http://codereview.chromium.org/1566013&lt;/a&gt;, Click the &amp;#8216;download raw patch&amp;#8217; link and save. Assuming you&amp;#8217;re in the &lt;tt&gt;chromium/src&lt;/tt&gt; directory, type: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;patch -p0 &amp;lt; filename_of_the_patch_you_just_downloaded&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Find the commented-out-section in net.gyp (look for &amp;#8216;flip_in_mem_edsm_server&amp;#8221;) and uncomment it.&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you&amp;#8217;ve done all that, you do: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make out/Debug/flip_in_mem_edsm_server &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;I had to change these lines to get rid of some compiling errors :&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;While compiling I got :&lt;br /&gt;
+&amp;gt; &lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/usr/include/linux/tcp.h:72: error: &amp;lsquo;__u32 &lt;strong&gt;fswab32(&lt;/strong&gt;u32)&amp;rsquo; cannot
+appear in a constant-expression
+/usr/include/linux/tcp.h:72: error: a function call cannot appear in a
+constant-expression
+/usr/include/linux/tcp.h:73: error: &amp;lsquo;__u32 &lt;strong&gt;fswab32(&lt;/strong&gt;u32)&amp;rsquo; cannot
+appear in a constant-expression
+/usr/include/linux/tcp.h:73: error: a function call cannot appear in a
+constant-expression
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;To fix it, in file &lt;tt&gt;src/net/tools/flip_server/flip_in_mem_edsm_server.cc&lt;/tt&gt; change the line that reads:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;#include &amp;lt;linux/tcp.h&amp;gt;&lt;/pre&gt;
+
+&lt;p&gt;to&lt;/p&gt;
+
+&lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;#include &amp;lt;netinet/tcp.h&amp;gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;In the same file change : &lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;state-&amp;gt;ssl_method = SSLv23_method();&lt;/pre&gt;&lt;/p&gt;
+
+&lt;p&gt;to&lt;/p&gt;
+
+&lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;state-&amp;gt;ssl_method = const_cast&amp;lt;SSL_METHOD *&amp;gt; (SSLv23_method()); &lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;I was getting some errors related to &lt;tt&gt;printSslError &lt;/tt&gt; function in &lt;tt&gt;flip_in_mem_edsm_server.cc&lt;/tt&gt;, it seems that this function prints out the errors related to SSL encryption, since I did not need that I commented the contents of the function out.&lt;/p&gt;&lt;/li&gt;
+&lt;/ul&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&#34;install-chrome-which-is-able-to-talk-to-localhost-server:9b6dd0bb85defcc32bbe025166e81019&#34;&gt;Install Chrome which is able to talk to localhost server&lt;/h2&gt;
+
+&lt;p&gt;Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run &lt;tt&gt;bash filename&lt;/tt&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;pre class=&#34;brush: bash; collapse: true; light: false; title: ; toolbar: true; notranslate&#34; title=&#34;&#34;&gt;#!/bin/bash&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;if [ &amp;ldquo;$(dpkg &amp;ndash;print-architecture)&amp;rdquo; == &amp;ldquo;amd64&amp;rdquo; ]; then
+  echo -ne &amp;ldquo;\n\nYou have a 64 bit computer\n\n&amp;rdquo;
+  linux_versions=&amp;ldquo;linux64&amp;rdquo;;
+else
+  echo -ne &amp;ldquo;\n\nYou have a 32 bit computer\n\n&amp;rdquo;
+  linux_versions=&amp;ldquo;linux&amp;rdquo;;
+fi&lt;/p&gt;
+
+&lt;p&gt;for linux_version in $linux_versions; do
+  install_dir=$HOME/spdy-chrome-canary/$linux_version&lt;/p&gt;
+
+&lt;p&gt;if mkdir -p $install_dir; then
+    echo &amp;ldquo;Directory: \&amp;ldquo;$install_dir\&amp;rdquo; made or already existed&amp;rdquo;
+  else
+      echo &amp;ldquo;$install_dir exists, but is not a directory.&amp;rdquo;
+      echo &amp;ldquo;Please remove whatever is there so this script can proceed next time.&amp;rdquo;
+      exit 128
+  fi&lt;/p&gt;
+
+&lt;p&gt;pushd $install_dir&lt;/p&gt;
+
+&lt;p&gt;install -d chrome-linux-old
+  mv chrome-linux chrome-linux-old/chrome-linux-&lt;code&gt;date +&amp;quot;%F-%k-%M-%S-%N&amp;quot;&lt;/code&gt;
+  rm -rf chrome-linux chrome-linux-old chrome-linux.zip
+  wget &lt;a href=&#34;http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip&#34;&gt;http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip&lt;/a&gt;
+  unzip chrome-linux.zip
+  rm -rf chrome-linux.zip&lt;/p&gt;
+
+&lt;p&gt;popd&lt;/p&gt;
+
+&lt;p&gt;filename_base=SPDY-Chrome-$linux_version
+  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=$filename_base
+Categories=Application;Network;WebBrowser;
+Exec=$install_dir/chrome-linux/chrome &amp;ndash;use-spdy &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base %U
+Icon=/tmp/chrome-linux/product_logo_48.png
+MimeType=text/html;text/xml;
+Terminal=false
+Type=Application
+EOF&lt;/p&gt;
+
+&lt;p&gt;filename_base=SPDY-Chrome-local-server-$linux_version
+  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=$filename_base
+Categories=Application;Network;WebBrowser;
+Exec=$install_dir/chrome-linux/chrome &amp;ndash;use-spdy &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base &amp;ndash;host-resolver-rules=&amp;lsquo;MAP * localhost&amp;rsquo; &amp;ndash;testing-fixed-http-port=10040 &amp;ndash;testing-fixed-https-port=10040 %U
+Icon=/tmp/chrome-linux/product_logo_48.png
+MimeType=text/html;text/xml;
+Terminal=false
+Type=Application
+EOF&lt;/p&gt;
+
+&lt;p&gt;filename_base=NO-SPDY-Chrome-local-server-$linux_version
+  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=$filename_base
+Categories=Application;Network;WebBrowser;
+Exec=$install_dir/chrome-linux/chrome &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base &amp;ndash;host-resolver-rules=&amp;lsquo;MAP * localhost&amp;rsquo; &amp;ndash;testing-fixed-http-port=16002 &amp;ndash;testing-fixed-https-port=16002 %U
+Icon=/tmp/chrome-linux/product_logo_48.png
+MimeType=text/html;text/xml;
+Terminal=false
+Type=Application
+EOF&lt;/p&gt;
+
+&lt;p&gt;done
+&lt;/pre&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&#39;st\_facebook&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_email&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_fblike&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_plusone&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>The power of options</title>
+      <link>http://samanbarghi.com/2010/03/16/the-power-of-options</link>
+      <pubDate>Tue, 16 Mar 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2010/03/16/the-power-of-options</guid>
+      <description>&lt;p&gt;The library of Davis Center at University of Waterloo is a fairly popular place for students to spend their time studying. There is this quiet section, with separate study space for each student equipped with florescent lighting, where seems to be the most popular place in the library. Based on the time of day, if exams time is close or not, if it is a weekend or not, and some other parameters, two possible scenarios might happen; the place is either packed or is half empty. Now, the interesting part is how students behave while looking for a place in this section.&lt;/p&gt;
+
+&lt;p&gt;Lets consider the first scenario when the study area is packed;  in this case all desks are occupied and if you get lucky and be fast, you might be able to find an empty spot. So in this case you have to walk fast, focus on what you are looking for, and as soon as finding an empty spot,  you sit down without a second thought.&lt;/p&gt;
+
+&lt;p&gt;Nonetheless, there are more available seats on the second scenario as you walk in to the study area. Considering the first case, you should be happy with the first available spot. This time students show a totally different behavior (including me). Now that they have more options, they do not simply sit on the first available spot they find unlike the former situation. Students tend to have &lt;strong&gt;preferences&lt;/strong&gt;, they take their time to walk around and find their **preferred **spot, although the seats are exactly the same.&lt;/p&gt;
+
+&lt;p&gt;What happened? Students developed preferences when they had more options, and were fully satisfied with their choice when there were no options available. After observing this behavior, I recalled the &lt;a title=&#34;Barry Schartws on the Paradox of Choice&#34; href=&#34;http://www.ted.com/talks/barry_schwartz_on_the_paradox_of_choice.html&#34; target=&#34;_blank&#34;&gt;Barry Schwartz TED talk on the &amp;#8220;Paradox of Choice&amp;#8221;&lt;/a&gt;. In this talk he notes the availability of more choices made us more paralyzed and dissatisfied rather than free and satisfied.&lt;/p&gt;
+
+&lt;p&gt;You can observe such a scenario in your everyday life; in relationships for example,  you are always looking for a better match, if you think there is someone better for you out there, you will be unhappy about your relationship.  As another example, when I started my PhD, I had the option to get a job instead, so sometimes I feel finding a job could have been a better choice at that time, and thinking about the possible benefits of a job making me dissatisfied. If I only had the PhD option I could have been happier as I knew that was the only choice I had.  As a graduate student in Canada, during the winter I do more studying than summer, why? Good weather during the summer is the answer, I have the option to go out and enjoy the weather instead of sitting in my office without any windows (The funny thing about the Computer Science department at University of Waterloo is that it made out of glass but none of the offices have windows !!! Yet as you can see, this is another example of being dissatisfied as I am aware of the option of having an office with windows). Even reading a book such as David Allen&amp;#8217;s  &lt;a title=&#34;Getting Things Done&#34; href=&#34;http://www.amazon.ca/Getting-Things-Done-David-Allen/dp/0142000280/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Getting Things Done (GTD)&amp;#8221;&lt;/a&gt;,  make you spend a week or two to find a good way of implementing it. The reason is that there are too many options for starting such a system.  I, myself ended up using a &lt;a title=&#34;Moleskine&#34; href=&#34;http://www.moleskine.com/&#34; target=&#34;_blank&#34;&gt;moleskine&lt;/a&gt; and a pen at the end.&lt;/p&gt;
+
+&lt;p&gt;This simple aspect of people&amp;#8217;s behavior can be very powerful for marketing ideas. Dan Areily in &lt;a title=&#34;Predictably Irrational&#34; href=&#34;http://www.predictablyirrational.com/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Predictably Irrational&amp;#8221;&lt;/a&gt; give an example on the first bread maker. When bread makers were first introduced they were not selling good, as people could not find a reason to buy one. But when the company introduced the second bread maker which was more expensive than the first one, people started to buy the first bread maker and sales took off. People started to have something to compare the first bread maker with, and since it was priced more reasonably they found the urge to buy it.&lt;/p&gt;
+
+&lt;p&gt;One another obvious example, which you might have experienced, is the store sales and discounts. Not all but some people tend to buy everything that they find on sale, even if they do not need it. I have a friend who is addicted to shopping, it does not matter what it is as long as it is on sale, it is good to buy, Why? It is just about the good and victorious feeling that he has after finding a deal, and he can talk about it for hours. There is no doubt that you have experienced the same feeling, think of the moments you were talking about a good deal you found on your favorite gadget (or dress).&lt;/p&gt;
+
+&lt;p&gt;If you look it from another angle, these deals can make you dissatisfied as well. For instance, I was trying to buy a laptop backpack and found hundreds of them online, it took me almost two weeks to make a decision and choose one. However, at the end if you hear someone talking about a deal on backpack laptops or you happen to go to a store with a better and cheaper backpack you will be dissatisfied immediately. There is this documentary about &lt;a title=&#34;How to make better decisions&#34; href=&#34;http://topdocumentaryfilms.com/how-to-make-better-decisions/&#34; target=&#34;_blank&#34;&gt;how to make better decisions&lt;/a&gt; from BBC, the experiments in this documentary are surprisingly unbelievable. There is an experiment, in which two photos from different persons are shown to the participants. They choose one of them that they like more than the other, with a simple trick the photo they did not like is given to them instead of the one they ed more. Now, the participants are asked :why they like that person? (of course, without knowing that this person is not the one they chose). They start explaining the reasons although they did not have any interest in that person. This experiment shows how people can simply change their mind and be satisfied with the new situation, if the options are removed.&lt;/p&gt;
+
+&lt;p&gt;Tim Harford in his book, &lt;a title=&#34;The logic of Life&#34; href=&#34;http://timharford.com/logicoflife/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;The logic of Life&amp;#8221;&lt;/a&gt;, gives another example about this issue. He provides an experiment over speed dating, where random people are brought to a room and they have limited time to talk to each other, and at the end,  each person pick a match based on their standards.  Tim notes that girls are more attracted to tall guys and guys are more attracted to thin girls. Imagine that, in a speed dating night there are 20 guys and 20 girls. Tim says that if there is a short guy among the guys and other guys are mostly tall, the short guy most probably will not get a date. However, if all 20 guys are short in the session, girls lower their expectations, compromise with the new situation and the chance of each short guy of being picked is higher. The story is the same for fat girls.  As you can see, adding or removing choices will make people act differently, although the short guy is still the same.&lt;/p&gt;
+
+&lt;p&gt;In conclusion, it seems that &lt;strong&gt;choice&lt;/strong&gt; is a very powerful parameter that shapes the decisions we make. Providing more choices, or removing them can be easily used by businesses, governments and advertisers to control our life without us even knowing it.  As Barry Schwartz states:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&amp;#8220;one should lower his expectations to be more happy&amp;#8221;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;The power of options&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/16/the-power-of-options/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
