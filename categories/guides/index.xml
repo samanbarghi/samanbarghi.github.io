@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Guides on Saman Barghi</title>
-    <link>http://samanbarghi.com/categories/guides/</link>
+    <link>http://samanbarghi.github.io/categories/guides/</link>
     <description>Recent content in Guides on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Wed, 31 Mar 2010 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.com/categories/guides/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.github.io/categories/guides/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>SPDY installation</title>
-      <link>http://samanbarghi.com/2010/03/31/spdy-installation</link>
+      <link>http://samanbarghi.github.io/2010/03/31/spdy-installation</link>
       <pubDate>Wed, 31 Mar 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.com/2010/03/31/spdy-installation</guid>
+      <guid>http://samanbarghi.github.io/2010/03/31/spdy-installation</guid>
       <description>
 
 &lt;p&gt;I am taking a course called &amp;#8220;Latency in Communication Systems&amp;#8221; taught by &lt;a href=&#34;http://www.cs.uwaterloo.ca/~mkarsten/&#34; target=&#34;_blank&#34;&gt;Martin Karsten&lt;/a&gt; in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate &lt;a title=&#34;SPDY&#34; href=&#34;http://www.chromium.org/spdy&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;SPDY&lt;/strong&gt;&lt;/a&gt;. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it&amp;#8217;s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.&lt;/p&gt;
