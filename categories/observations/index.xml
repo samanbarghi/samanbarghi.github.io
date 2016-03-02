@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Observations on Saman Barghi</title>
-    <link>http://samanbarghi.github.io/categories/observations/</link>
+    <link>http://samanbarghi.com/categories/observations/</link>
     <description>Recent content in Observations on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 11 Jan 2011 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.github.io/categories/observations/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.com/categories/observations/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Some Notes on Facebook Hacker Cup Qualification Round</title>
-      <link>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
+      <link>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
       <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
+      <guid>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
       <description>&lt;p&gt;Monday, January 10 was the last day to submit your answers to get qualified for Facebook Hacker Cup. It started from January 7, and lasted for 3 days. There were three problems presented on the competition website, to be solved by participants. Problems were provided with sample input and output, and there were no time limits to browse through the problems and to develop your code. To answer each problem, competitors had to download an input and submit their output, yet they only had 6 minutes, after they downloaded the input, to submit their answers through the form provided. There were absolutely no limitations on choosing the programming language (I used Perl), nor on the way you code your solution, cause there were no need to upload your source code. All three problems were fairly easy to solve, except one (called the peg game), that was not explained clearly. Anyone who solve at least one problem, would be qualified for the first round.&lt;/p&gt;
 
 &lt;p&gt;This competition could attract a fairly large number of young people around the world, and by that means, it can be counted as a success. Nevertheless, there were some fundamental design problems regarding the competition website itself, which is the topic of this post. These are some of the points that came into my mind:&lt;/p&gt;
@@ -34,10 +34,10 @@
     
     <item>
       <title>The Power of Free</title>
-      <link>http://samanbarghi.github.io/2010/07/13/the-power-of-free</link>
+      <link>http://samanbarghi.com/2010/07/13/the-power-of-free</link>
       <pubDate>Tue, 13 Jul 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/07/13/the-power-of-free</guid>
+      <guid>http://samanbarghi.com/2010/07/13/the-power-of-free</guid>
       <description>&lt;p&gt;I am no coffee drinker, I prefer green tea and herbal tea over coffee. I rarely break this habit, only if I am too sleepy or really crave coffee. But once I was in a gathering in Davis Center (at University of Waterloo) and they were offering free coffee and donuts. All of a sudden I found myself socializing and drinking coffee without having any good reason for breaking my habit, I could not justify my behavior at the time. After giving some thoughts to the matter, I came up with two reasons to justify this behavior; either that was the effect of the coffee being free, or the socializing effect; I wanted to be like others. Now there are two questions to be asked:&lt;/p&gt;
 
 &lt;p&gt;The first question is: is all the stuff that are being offered to you for free, are actually free? What are the hidden costs of free stuff for you? How much are you paying (mentally and physically) to get something that worth nothing (money wise)? Dan Ariely describe and [experiment ][1] that he runs about free ice cream in his blog. He claims that free stuff are not actually free, cause for example you are investing your time in the line to get an ice cream that worth $1.45. But is that the only price you are paying? What about an overweight person who is on a diet and happened to pass by Ben &amp;amp; Jerry, and decides to get one ice-cream cause it&amp;#8217;s free? (Yeah will power is effective here, but sometimes FREE is more tempting than anything else)&lt;/p&gt;
@@ -54,10 +54,10 @@
     
     <item>
       <title>Rationality</title>
-      <link>http://samanbarghi.github.io/2010/04/12/rationality</link>
+      <link>http://samanbarghi.com/2010/04/12/rationality</link>
       <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/04/12/rationality</guid>
+      <guid>http://samanbarghi.com/2010/04/12/rationality</guid>
       <description>&lt;p&gt;There are moments in life when you have to make a big decision, however, your emotions and ego block your mind. You cannot think clearly, and you see everything the way you want them to be, but the reality is on the exact opposite side. If you just rely on yourself and float in your thoughts, you are gonna drown at the very bottom of these thoughts. There is no way out of your doubts and uncertainty, it either makes you go crazy or  never let you get in touch with reality.&lt;/p&gt;
 
 &lt;p&gt;You are trapped in a box created by you, and you cannot see out of the box, all you need is to break the wall and see outside of the box. But not everybody is strong enough to overcome their fears of what they are about to see and embrace the reality. These are the exact moments that friends were created for, you need someone that sees outside the box. If you consult the situation with someone else, someone you trust, you can see through his eyes and step by step see the light of reality.&lt;/p&gt;
@@ -74,10 +74,10 @@
     
     <item>
       <title>See ID</title>
-      <link>http://samanbarghi.github.io/2010/04/12/see-id</link>
+      <link>http://samanbarghi.com/2010/04/12/see-id</link>
       <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/04/12/see-id</guid>
+      <guid>http://samanbarghi.com/2010/04/12/see-id</guid>
       <description>&lt;p&gt;I used to be asked to show my ID every time  I was paying by my credit card, and yes you are right, I did not sign the back of my credit card (That is how it works in Canada, they are taking it to the next level for entering a PIN number though). Today I was asked to show my ID again, but I noticed  no one has asked me to show my ID for last two months. Surprisingly, I could successfully stop ID checks without signing the back of my credit card. You are probably confused, but it is not that complicated. Instead of signing the back, I simply wrote &amp;#8220;&lt;strong&gt;&lt;em&gt;See ID&lt;/em&gt;&lt;/strong&gt;&amp;#8221; on the signature area. It was supposed to make cashiers to ask more about my ID, but to my surprise it worked the other way !&lt;/p&gt;
 
 &lt;p&gt;Does anyone has a rational explanation for the fake trust created by writing such a sentence? The first question I asked myself was  if the sentence created some sort of trust, or it is just because people do not like to do what they are told to do. What makes people more trustful when you directly tell them what you expect them to do!? I will start to do some research to find a proper answer to my question.&lt;/p&gt;
@@ -88,10 +88,10 @@
     
     <item>
       <title>The power of options</title>
-      <link>http://samanbarghi.github.io/2010/03/16/the-power-of-options</link>
+      <link>http://samanbarghi.com/2010/03/16/the-power-of-options</link>
       <pubDate>Tue, 16 Mar 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/03/16/the-power-of-options</guid>
+      <guid>http://samanbarghi.com/2010/03/16/the-power-of-options</guid>
       <description>&lt;p&gt;The library of Davis Center at University of Waterloo is a fairly popular place for students to spend their time studying. There is this quiet section, with separate study space for each student equipped with florescent lighting, where seems to be the most popular place in the library. Based on the time of day, if exams time is close or not, if it is a weekend or not, and some other parameters, two possible scenarios might happen; the place is either packed or is half empty. Now, the interesting part is how students behave while looking for a place in this section.&lt;/p&gt;
 
 &lt;p&gt;Lets consider the first scenario when the study area is packed;  in this case all desks are occupied and if you get lucky and be fast, you might be able to find an empty spot. So in this case you have to walk fast, focus on what you are looking for, and as soon as finding an empty spot,  you sit down without a second thought.&lt;/p&gt;

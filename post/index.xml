@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Posts on Saman Barghi</title>
-    <link>http://samanbarghi.github.io/post/</link>
+    <link>http://samanbarghi.com/post/</link>
     <description>Recent content in Posts on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 05 Sep 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.github.io/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.com/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>How to wrap a system call (libc function) in Linux</title>
-      <link>http://samanbarghi.github.io/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</link>
+      <link>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</link>
       <pubDate>Fri, 05 Sep 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</guid>
+      <guid>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</guid>
       <description>
 
 &lt;p&gt;For one of my research projects I had to wrap linux system calls and redirect
@@ -291,10 +291,10 @@ Hello, World!
     
     <item>
       <title>National Geographic Photo of the day Downloader for Linux</title>
-      <link>http://samanbarghi.github.io/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
+      <link>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
       <pubDate>Wed, 29 Aug 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
+      <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
       <description>
 
 &lt;p&gt;[&lt;img class=&#34;wp-image-252 alignleft&#34; title=&#34;National Geographic Photo Of the Day&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721-300x225.jpg&#34; alt=&#34;National Geographic Photo Of the Day&#34; width=&#34;300&#34; height=&#34;225&#34; /&gt;][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
@@ -333,10 +333,10 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
     
     <item>
       <title>What Might My Resume look Like If I Were a Computer !?</title>
-      <link>http://samanbarghi.github.io/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</link>
+      <link>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</link>
       <pubDate>Mon, 21 May 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
+      <guid>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
       <description>
 
 &lt;p&gt;The other day I was about to update my resume, and this crazy question came to my mind:&lt;br /&gt;
@@ -373,10 +373,10 @@ But how does this all work together? Well there is a concept called temporal loc
     
     <item>
       <title>Mercurial on Bluehost</title>
-      <link>http://samanbarghi.github.io/2011/08/26/mercurial-on-bluehost</link>
+      <link>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</link>
       <pubDate>Fri, 26 Aug 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/08/26/mercurial-on-bluehost</guid>
+      <guid>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</guid>
       <description>&lt;p style=&#34;text-align: left;&#34;&gt;
   I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions available (&lt;a href=&#34;http://bugtracker.gttools.com/public/wiki/bluehost/Mercurial&#34;&gt;this&lt;/a&gt; and &lt;a href=&#34;http://gttools.com/bluehost-setup/mercurial-and-trac-setup-on-bluehost&#34;&gt;this&lt;/a&gt;). But they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost):
 &lt;/p&gt;
@@ -516,10 +516,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>SSH to VirtualBox 3 FreeBsd Guests</title>
-      <link>http://samanbarghi.github.io/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
+      <link>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
       <pubDate>Fri, 04 Feb 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
+      <guid>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
       <description>&lt;p&gt;This post is based on &lt;a href=&#34;http://muffinresearch.co.uk/archives/2010/02/08/howto-ssh-into-virtualbox-3-linux-guests/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Howto: SSH into VirtualBox 3 Linux Guests&amp;#8221;&lt;/a&gt; by &lt;a href=&#34;http://muffinresearch.co.uk/&#34; target=&#34;_blank&#34;&gt;Stuart Colville&lt;/a&gt;, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.&lt;/p&gt;
 
 &lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;
@@ -565,10 +565,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>Some Notes on Facebook Hacker Cup Qualification Round</title>
-      <link>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
+      <link>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
       <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
+      <guid>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
       <description>&lt;p&gt;Monday, January 10 was the last day to submit your answers to get qualified for Facebook Hacker Cup. It started from January 7, and lasted for 3 days. There were three problems presented on the competition website, to be solved by participants. Problems were provided with sample input and output, and there were no time limits to browse through the problems and to develop your code. To answer each problem, competitors had to download an input and submit their output, yet they only had 6 minutes, after they downloaded the input, to submit their answers through the form provided. There were absolutely no limitations on choosing the programming language (I used Perl), nor on the way you code your solution, cause there were no need to upload your source code. All three problems were fairly easy to solve, except one (called the peg game), that was not explained clearly. Anyone who solve at least one problem, would be qualified for the first round.&lt;/p&gt;
 
 &lt;p&gt;This competition could attract a fairly large number of young people around the world, and by that means, it can be counted as a success. Nevertheless, there were some fundamental design problems regarding the competition website itself, which is the topic of this post. These are some of the points that came into my mind:&lt;/p&gt;
@@ -588,10 +588,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>The Power of Free</title>
-      <link>http://samanbarghi.github.io/2010/07/13/the-power-of-free</link>
+      <link>http://samanbarghi.com/2010/07/13/the-power-of-free</link>
       <pubDate>Tue, 13 Jul 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/07/13/the-power-of-free</guid>
+      <guid>http://samanbarghi.com/2010/07/13/the-power-of-free</guid>
       <description>&lt;p&gt;I am no coffee drinker, I prefer green tea and herbal tea over coffee. I rarely break this habit, only if I am too sleepy or really crave coffee. But once I was in a gathering in Davis Center (at University of Waterloo) and they were offering free coffee and donuts. All of a sudden I found myself socializing and drinking coffee without having any good reason for breaking my habit, I could not justify my behavior at the time. After giving some thoughts to the matter, I came up with two reasons to justify this behavior; either that was the effect of the coffee being free, or the socializing effect; I wanted to be like others. Now there are two questions to be asked:&lt;/p&gt;
 
 &lt;p&gt;The first question is: is all the stuff that are being offered to you for free, are actually free? What are the hidden costs of free stuff for you? How much are you paying (mentally and physically) to get something that worth nothing (money wise)? Dan Ariely describe and [experiment ][1] that he runs about free ice cream in his blog. He claims that free stuff are not actually free, cause for example you are investing your time in the line to get an ice cream that worth $1.45. But is that the only price you are paying? What about an overweight person who is on a diet and happened to pass by Ben &amp;amp; Jerry, and decides to get one ice-cream cause it&amp;#8217;s free? (Yeah will power is effective here, but sometimes FREE is more tempting than anything else)&lt;/p&gt;
@@ -608,10 +608,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>Rationality</title>
-      <link>http://samanbarghi.github.io/2010/04/12/rationality</link>
+      <link>http://samanbarghi.com/2010/04/12/rationality</link>
       <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/04/12/rationality</guid>
+      <guid>http://samanbarghi.com/2010/04/12/rationality</guid>
       <description>&lt;p&gt;There are moments in life when you have to make a big decision, however, your emotions and ego block your mind. You cannot think clearly, and you see everything the way you want them to be, but the reality is on the exact opposite side. If you just rely on yourself and float in your thoughts, you are gonna drown at the very bottom of these thoughts. There is no way out of your doubts and uncertainty, it either makes you go crazy or  never let you get in touch with reality.&lt;/p&gt;
 
 &lt;p&gt;You are trapped in a box created by you, and you cannot see out of the box, all you need is to break the wall and see outside of the box. But not everybody is strong enough to overcome their fears of what they are about to see and embrace the reality. These are the exact moments that friends were created for, you need someone that sees outside the box. If you consult the situation with someone else, someone you trust, you can see through his eyes and step by step see the light of reality.&lt;/p&gt;
@@ -628,10 +628,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>See ID</title>
-      <link>http://samanbarghi.github.io/2010/04/12/see-id</link>
+      <link>http://samanbarghi.com/2010/04/12/see-id</link>
       <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/04/12/see-id</guid>
+      <guid>http://samanbarghi.com/2010/04/12/see-id</guid>
       <description>&lt;p&gt;I used to be asked to show my ID every time  I was paying by my credit card, and yes you are right, I did not sign the back of my credit card (That is how it works in Canada, they are taking it to the next level for entering a PIN number though). Today I was asked to show my ID again, but I noticed  no one has asked me to show my ID for last two months. Surprisingly, I could successfully stop ID checks without signing the back of my credit card. You are probably confused, but it is not that complicated. Instead of signing the back, I simply wrote &amp;#8220;&lt;strong&gt;&lt;em&gt;See ID&lt;/em&gt;&lt;/strong&gt;&amp;#8221; on the signature area. It was supposed to make cashiers to ask more about my ID, but to my surprise it worked the other way !&lt;/p&gt;
 
 &lt;p&gt;Does anyone has a rational explanation for the fake trust created by writing such a sentence? The first question I asked myself was  if the sentence created some sort of trust, or it is just because people do not like to do what they are told to do. What makes people more trustful when you directly tell them what you expect them to do!? I will start to do some research to find a proper answer to my question.&lt;/p&gt;
@@ -642,10 +642,10 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
     
     <item>
       <title>SPDY installation</title>
-      <link>http://samanbarghi.github.io/2010/03/31/spdy-installation</link>
+      <link>http://samanbarghi.com/2010/03/31/spdy-installation</link>
       <pubDate>Wed, 31 Mar 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/03/31/spdy-installation</guid>
+      <guid>http://samanbarghi.com/2010/03/31/spdy-installation</guid>
       <description>
 
 &lt;p&gt;I am taking a course called &amp;#8220;Latency in Communication Systems&amp;#8221; taught by &lt;a href=&#34;http://www.cs.uwaterloo.ca/~mkarsten/&#34; target=&#34;_blank&#34;&gt;Martin Karsten&lt;/a&gt; in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate &lt;a title=&#34;SPDY&#34; href=&#34;http://www.chromium.org/spdy&#34; target=&#34;_blank&#34;&gt;&lt;strong&gt;SPDY&lt;/strong&gt;&lt;/a&gt;. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it&amp;#8217;s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.&lt;/p&gt;
@@ -829,10 +829,10 @@ EOF&lt;/p&gt;
     
     <item>
       <title>The power of options</title>
-      <link>http://samanbarghi.github.io/2010/03/16/the-power-of-options</link>
+      <link>http://samanbarghi.com/2010/03/16/the-power-of-options</link>
       <pubDate>Tue, 16 Mar 2010 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2010/03/16/the-power-of-options</guid>
+      <guid>http://samanbarghi.com/2010/03/16/the-power-of-options</guid>
       <description>&lt;p&gt;The library of Davis Center at University of Waterloo is a fairly popular place for students to spend their time studying. There is this quiet section, with separate study space for each student equipped with florescent lighting, where seems to be the most popular place in the library. Based on the time of day, if exams time is close or not, if it is a weekend or not, and some other parameters, two possible scenarios might happen; the place is either packed or is half empty. Now, the interesting part is how students behave while looking for a place in this section.&lt;/p&gt;
 
 &lt;p&gt;Lets consider the first scenario when the study area is packed;  in this case all desks are occupied and if you get lucky and be fast, you might be able to find an empty spot. So in this case you have to walk fast, focus on what you are looking for, and as soon as finding an empty spot,  you sit down without a second thought.&lt;/p&gt;

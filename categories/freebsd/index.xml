@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Freebsd on Saman Barghi</title>
-    <link>http://samanbarghi.github.io/categories/freebsd/</link>
+    <link>http://samanbarghi.com/categories/freebsd/</link>
     <description>Recent content in Freebsd on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 04 Feb 2011 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.github.io/categories/freebsd/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.com/categories/freebsd/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>SSH to VirtualBox 3 FreeBsd Guests</title>
-      <link>http://samanbarghi.github.io/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
+      <link>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
       <pubDate>Fri, 04 Feb 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
+      <guid>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
       <description>&lt;p&gt;This post is based on &lt;a href=&#34;http://muffinresearch.co.uk/archives/2010/02/08/howto-ssh-into-virtualbox-3-linux-guests/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Howto: SSH into VirtualBox 3 Linux Guests&amp;#8221;&lt;/a&gt; by &lt;a href=&#34;http://muffinresearch.co.uk/&#34; target=&#34;_blank&#34;&gt;Stuart Colville&lt;/a&gt;, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.&lt;/p&gt;
 
 &lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;

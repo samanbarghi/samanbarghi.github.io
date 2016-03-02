@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Uncategorized on Saman Barghi</title>
-    <link>http://samanbarghi.github.io/categories/uncategorized/</link>
+    <link>http://samanbarghi.com/categories/uncategorized/</link>
     <description>Recent content in Uncategorized on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 26 Aug 2011 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.github.io/categories/uncategorized/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.com/categories/uncategorized/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Mercurial on Bluehost</title>
-      <link>http://samanbarghi.github.io/2011/08/26/mercurial-on-bluehost</link>
+      <link>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</link>
       <pubDate>Fri, 26 Aug 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/08/26/mercurial-on-bluehost</guid>
+      <guid>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</guid>
       <description>&lt;p style=&#34;text-align: left;&#34;&gt;
   I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions available (&lt;a href=&#34;http://bugtracker.gttools.com/public/wiki/bluehost/Mercurial&#34;&gt;this&lt;/a&gt; and &lt;a href=&#34;http://gttools.com/bluehost-setup/mercurial-and-trac-setup-on-bluehost&#34;&gt;this&lt;/a&gt;). But they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost):
 &lt;/p&gt;

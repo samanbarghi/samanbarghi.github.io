@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Geeky on Saman Barghi</title>
-    <link>http://samanbarghi.github.io/categories/geeky/</link>
+    <link>http://samanbarghi.com/categories/geeky/</link>
     <description>Recent content in Geeky on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 05 Sep 2014 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.github.io/categories/geeky/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://samanbarghi.com/categories/geeky/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>How to wrap a system call (libc function) in Linux</title>
-      <link>http://samanbarghi.github.io/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</link>
+      <link>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</link>
       <pubDate>Fri, 05 Sep 2014 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</guid>
+      <guid>http://samanbarghi.com/blog/2014/09/05/how-to-wrap-a-system-call-libc-function-in-linux/</guid>
       <description>
 
 &lt;p&gt;For one of my research projects I had to wrap linux system calls and redirect
@@ -291,10 +291,10 @@ Hello, World!
     
     <item>
       <title>National Geographic Photo of the day Downloader for Linux</title>
-      <link>http://samanbarghi.github.io/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
+      <link>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
       <pubDate>Wed, 29 Aug 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
+      <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
       <description>
 
 &lt;p&gt;[&lt;img class=&#34;wp-image-252 alignleft&#34; title=&#34;National Geographic Photo Of the Day&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721-300x225.jpg&#34; alt=&#34;National Geographic Photo Of the Day&#34; width=&#34;300&#34; height=&#34;225&#34; /&gt;][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
@@ -333,10 +333,10 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
     
     <item>
       <title>What Might My Resume look Like If I Were a Computer !?</title>
-      <link>http://samanbarghi.github.io/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</link>
+      <link>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</link>
       <pubDate>Mon, 21 May 2012 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
+      <guid>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
       <description>
 
 &lt;p&gt;The other day I was about to update my resume, and this crazy question came to my mind:&lt;br /&gt;
@@ -373,10 +373,10 @@ But how does this all work together? Well there is a concept called temporal loc
     
     <item>
       <title>Some Notes on Facebook Hacker Cup Qualification Round</title>
-      <link>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
+      <link>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</link>
       <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.github.io/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
+      <guid>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round</guid>
       <description>&lt;p&gt;Monday, January 10 was the last day to submit your answers to get qualified for Facebook Hacker Cup. It started from January 7, and lasted for 3 days. There were three problems presented on the competition website, to be solved by participants. Problems were provided with sample input and output, and there were no time limits to browse through the problems and to develop your code. To answer each problem, competitors had to download an input and submit their output, yet they only had 6 minutes, after they downloaded the input, to submit their answers through the form provided. There were absolutely no limitations on choosing the programming language (I used Perl), nor on the way you code your solution, cause there were no need to upload your source code. All three problems were fairly easy to solve, except one (called the peg game), that was not explained clearly. Anyone who solve at least one problem, would be qualified for the first round.&lt;/p&gt;
 
 &lt;p&gt;This competition could attract a fairly large number of young people around the world, and by that means, it can be counted as a success. Nevertheless, there were some fundamental design problems regarding the competition website itself, which is the topic of this post. These are some of the points that came into my mind:&lt;/p&gt;
