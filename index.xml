@@ -6,8 +6,27 @@
     <description>Recent content on Saman Barghi</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 08 Dec 2015 02:09:03 -0500</lastBuildDate>
+    <lastBuildDate>Tue, 20 Sep 2016 00:27:47 -0400</lastBuildDate>
     <atom:link href="http://samanbarghi.com/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Projects</title>
+      <link>http://samanbarghi.com/projects/</link>
+      <pubDate>Tue, 20 Sep 2016 00:27:47 -0400</pubDate>
+      
+      <guid>http://samanbarghi.com/projects/</guid>
+      <description>&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;http://samanbarghi.com/sher-negar&#34;&gt;Sher-negar&lt;/a&gt;: Persian poem illustrator
+developed by Angularjs and Raphaeljs.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://github.com/samanbarghi/MPSCQ&#34;&gt;MPSCQ&lt;/a&gt;: lock-free, multi-producer
+single consumer queue in C++&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://github.com/samanbarghi/uThreads&#34;&gt;uThreads&lt;/a&gt;: Concurrent threading
+library in C++ based on lightweight threads (fibers) that supprots M:N mapping&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;http://github.com/samanbarghi/ngphotodownloader&#34;&gt;ngphotodownloader&lt;/a&gt;: Simple
+bash script to download National Geographic photo of the day in Linux&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
     
     <item>
       <title>About</title>
