@@ -93,8 +93,7 @@
     </script></p>
     
 
-    <p>Copyright &copy; 2016 <a href="http://samanbarghi.com/license/">License</a><br/>
-       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+    
   </div>
 </div>
 
@@ -102,7 +101,7 @@
 <div class="content container">
   <div class="post">
     <h1 class="post-title">Generate C interface from C&#43;&#43; source code using Clang libtooling</h1>
-    <span class="post-date">Dec 6, 2016 &middot; 24 minute read &middot; <a href="http://samanbarghi.com/blog/2016/12/06/generate-c-interface-from-c-source-code-using-clang-libtooling/#disqus_thread">Comments</a>
+    <span class="post-date">Dec 6, 2016 &middot; 22 minute read &middot; <a href="http://samanbarghi.com/blog/2016/12/06/generate-c-interface-from-c-source-code-using-clang-libtooling/#disqus_thread">Comments</a>
     
     <br/>
     <a class="label" href="http://samanbarghi.com/categories/clang">clang</a><a class="label" href="http://samanbarghi.com/categories/llvm">llvm</a><a class="label" href="http://samanbarghi.com/categories/c">C</a><a class="label" href="http://samanbarghi.com/categories/c">C&#43;&#43;</a>
@@ -129,11 +128,11 @@ extern &quot;C&quot;{
 
 /* Wrapper struct to hold a pointer to
    Rectangle object in C  */
-struct      WRectangle;
+struct      WRectangle;             
 typedef     struct WRectangle WRectangle;
 
 /* Wrapper for the constructor */
-WRectangle*   Rectangle_create(int l, int w);
+WRectangle*   Rectangle_create(int l, int w);     
 /* Wrapper for destructor */
 void  Rectangle_destroy(WRectangle* self);
 /* Wrapper for method area */
@@ -175,7 +174,7 @@ int Rectangle_perimeter(WRectangle* self){
 
 <p><a href="http://clang.llvm.org/docs/LibTooling.html">Clang libtooling</a> supports writing standalone tools based on Clang. To generate the C interface, I use <a href="http://clang.llvm.org/docs/LibASTMatchersReference.html">Clang AST Matcher</a> to find public methods of specific classes and generate the C functions based on that. To get familiar with Clang AST you can refer to <a href="http://clang.llvm.org/docs/IntroductionToTheClangAST.html">this articls</a>.</p>
 
-<p>For this tool to work, you need LLVM and Clang installed on your system. You can either <a href="http://clang.llvm.org/get_started.html">build them from source</a>, which will take a long time to finish, or you can install precompiled packages for your operating system. I am using Calng version 4.0.0 and LLVM version 4.0.0, but I tested the code with Clang and LLVM v3.8 and it works fine. To install Clang and LLVM under ubuntu issue <code>sudo apt-get install llvm llvm-dev clang</code> (if installing llvm-3.8 you might want to use to following workaround provided <a href="https://github.com/iovisor/bcc/issues/492">here</a> to make it work).</p>
+<p>For this tool to work, you need LLVM and Clang installed on your system. You can either <a href="http://clang.llvm.org/get_started.html">build them from source</a>, which will take a long time to finish, or you can install precompiled packages for your operating system. I am using Calng version 4.0.0 and LLVM version 4.0.0, but I tested the code with Clang and LLVM v3.8 and it works fine. To install Clang and LLVM under ubuntu issue <code>sudo apt-get install llvm clang</code>.</p>
 
 <p>I am going to explain how I used Clang libtooling to generate the cwrapper files for uThreads. The finished code can be found <a href="https://github.com/samanbarghi/CPP2C">here</a>. This is not used to generate the actual cwrapper files under uThreads, as it still needs some improvements before it can be used in production. Before I explain the code, let&rsquo;s go through some rules and issues for generating the cwrapper functions:</p>
 
@@ -195,66 +194,19 @@ int Rectangle_perimeter(WRectangle* self){
 
 <p><code>include/uThreads.h</code> is the file that includes all the header files in uThreads, thus all uThreads classes and functions are present when passing the file to clang. Also, since many stdlib and system files are included the resulting AST is going to be very large, as it covers all the included files as well. Here are AST nodes related to constructor, destructor, and method <code>accept</code> from class Connection in uThreads:</p>
 
-<pre><code>|-CXXConstructorDecl 0x3a4a1f0 &lt;line:87:5, col:75&gt; col:5 Connection 'void (int, int, int) throw(std::system_error)'
-| |-ParmVarDecl 0x3a49fd8 &lt;col:16, col:20&gt; col:20 domain 'int'
-| |-ParmVarDecl 0x3a4a048 &lt;col:28, col:32&gt; col:32 type 'int'
-| |-ParmVarDecl 0x3a4a0b8 &lt;col:38, col:42&gt; col:42 protocol 'int'
-| `-FullComment 0x3bc0040 &lt;line:78:7, line:86:5&gt;
-|   |-ParagraphComment 0x3bbfdc0 &lt;line:78:7&gt;
-|   | `-TextComment 0x3bbfd90 &lt;col:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bbfde0 &lt;col:8, line:79:7&gt; Name=&quot;brief&quot;
-|   | `-ParagraphComment 0x3bbfe60 &lt;line:78:14, line:79:7&gt;
-|   |   |-TextComment 0x3bbfe10 &lt;line:78:14, col:65&gt; Text=&quot; Same as socket syscall adds | SOCK_NONBLOCK to type&quot;
-|   |   `-TextComment 0x3bbfe30 &lt;line:79:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bbfe80 &lt;col:8, col:37&gt; Name=&quot;return&quot;
-|   | `-ParagraphComment 0x3bbfee0 &lt;col:15, col:37&gt;
-|   |   `-TextComment 0x3bbfeb0 &lt;col:15, col:37&gt; Text=&quot; same as socket syscall&quot;
-|   |-ParagraphComment 0x3bbffa0 &lt;line:81:7, line:84:29&gt;
-|   | |-TextComment 0x3bbff00 &lt;line:81:7, col:69&gt; Text=&quot; Throws a std::system_error exception. Do not call from C code.&quot;
-|   | |-TextComment 0x3bbff20 &lt;line:82:7, col:68&gt; Text=&quot; The unerlying socket is always nonbelocking. This is achieved&quot;
-|   | |-TextComment 0x3bbff40 &lt;line:83:7, col:60&gt; Text=&quot; by adding a  (| SOCK_NONBLOCK) to type, thus requires&quot;
-|   | `-TextComment 0x3bbff60 &lt;line:84:7, col:29&gt; Text=&quot; linux kernels &gt; 2.6.27&quot;
-|   `-ParagraphComment 0x3bbfff0 &lt;line:86:1, col:5&gt;
-|     `-TextComment 0x3bbffc0 &lt;col:1, col:5&gt; Text=&quot;     &quot;
-|-CXXDestructorDecl 0x3a4a318 &lt;line:89:5, col:17&gt; col:5 ~Connection 'void (void)' noexcept-unevaluated 0x3a4a318
-|-CXXMethodDecl 0x3a4a630 &lt;line:99:5, col:75&gt; col:9 accept 'int (class Connection *, struct sockaddr *, socklen_t *)'
-| |-ParmVarDecl 0x3a4a408 &lt;col:16, col:28&gt; col:28 conn 'class Connection *'
-| |-ParmVarDecl 0x3a4a490 &lt;col:34, col:51&gt; col:51 addr 'struct sockaddr *'
-| |-ParmVarDecl 0x3a4a500 &lt;col:57, col:68&gt; col:68 addrlen 'socklen_t *'
-| `-FullComment 0x3bc03a0 &lt;line:92:7, line:97:52&gt;
-|   |-ParagraphComment 0x3bc00e0 &lt;line:92:7&gt;
-|   | `-TextComment 0x3bc00b0 &lt;col:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bc0100 &lt;col:8, line:94:7&gt; Name=&quot;brief&quot;
-|   | `-ParagraphComment 0x3bc01b0 &lt;line:92:14, line:94:7&gt;
-|   |   |-TextComment 0x3bc0130 &lt;line:92:14, col:75&gt; Text=&quot; nonblocking accept syscall and updating the passed Connection&quot;
-|   |   |-TextComment 0x3bc0150 &lt;line:93:7, col:13&gt; Text=&quot; object&quot;
-|   |   `-TextComment 0x3bc0170 &lt;line:94:7&gt; Text=&quot; &quot;
-|   |-ParamCommandComment 0x3bc01d0 &lt;col:8, line:95:7&gt; [in] implicitly Param=&quot;conn&quot; ParamIndex=0
-|   | `-ParagraphComment 0x3bc0280 &lt;line:94:19, line:95:7&gt;
-|   |   |-TextComment 0x3bc0230 &lt;line:94:19, col:73&gt; Text=&quot; Pointer to a Connection object that is not initialized&quot;
-|   |   `-TextComment 0x3bc0250 &lt;line:95:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bc02a0 &lt;col:8, col:41&gt; Name=&quot;return&quot;
-|   | `-ParagraphComment 0x3bc0300 &lt;col:15, col:41&gt;
-|   |   `-TextComment 0x3bc02d0 &lt;col:15, col:41&gt; Text=&quot; same as accept system call&quot;
-|   `-ParagraphComment 0x3bc0350 &lt;line:97:7, col:52&gt;
-|     `-TextComment 0x3bc0320 &lt;col:7, col:52&gt; Text=&quot;  This format is used for compatibility with C&quot;
-|-CXXMethodDecl 0x3a4a8c0 &lt;line:107:5, col:90&gt; col:17 accept 'class Connection *(struct sockaddr *, socklen_t *) throw(std::system_error)'
-| |-ParmVarDecl 0x3a4a740 &lt;col:24, col:41&gt; col:41 addr 'struct sockaddr *'
-| |-ParmVarDecl 0x3a4a7b0 &lt;col:47, col:58&gt; col:58 addrlen 'socklen_t *'
-| `-FullComment 0x3bc05f0 &lt;line:102:7, line:105:72&gt;
-|   |-ParagraphComment 0x3bc0440 &lt;line:102:7&gt;
-|   | `-TextComment 0x3bc0410 &lt;col:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bc0460 &lt;col:8, line:103:7&gt; Name=&quot;brief&quot;
-|   | `-ParagraphComment 0x3bc04e0 &lt;line:102:14, line:103:7&gt;
-|   |   |-TextComment 0x3bc0490 &lt;line:102:14, col:66&gt; Text=&quot; Accepts a connection and returns a connection object&quot;
-|   |   `-TextComment 0x3bc04b0 &lt;line:103:7&gt; Text=&quot; &quot;
-|   |-BlockCommandComment 0x3bc0500 &lt;col:8, col:39&gt; Name=&quot;return&quot;
-|   | `-ParagraphComment 0x3bc0560 &lt;col:15, col:39&gt;
-|   |   `-TextComment 0x3bc0530 &lt;col:15, col:39&gt; Text=&quot; Newly created connection&quot;
-|   `-ParagraphComment 0x3bc05b0 &lt;line:105:7, col:72&gt;
-|     `-TextComment 0x3bc0580 &lt;col:7, col:72&gt; Text=&quot; Throws a std::system_error exception on error. Never call from C.&quot;
-
-</code></pre>
+<p><a href="/images/2016-12-06/ast-dump.png">
+<figure >
+    
+        <img src="/images/2016-12-06/ast-dump.png" />
+    
+    
+    <figcaption>
+        <h4>AST Dump</h4>
+        
+    </figcaption>
+    
+</figure>
+</a></p>
 
 <p>AST node related to constructor is of type <code>CXXConstructorDecl</code>, AST node related to the destructor is of type <code>CXXDestructorDecl</code>, and the accept method is of type <code>CXXMethodDecl</code>. <a href="http://clang.llvm.org/doxygen/classclang_1_1CXXConstructorDecl.html">CXXConstructorDecl</a> and <a href="http://clang.llvm.org/doxygen/classclang_1_1CXXDestructorDecl.html">CXXDestructorDecl</a> are both childern of class <code>CXXMethodDecl</code>. Hence, by finding all method declarations, i.e. <code>CXXMethodDecl</code>, in AST we meet all the requirments to generate the C interface.</p>
 
@@ -409,13 +361,13 @@ static cl::opt&lt;std::string&gt; OutputFilename(&quot;o&quot;, cl::desc(Options
 
 <pre><code>/** Classes to be mapped to C **/
 struct OutputStreams{
-  string headerString;
-  string bodyString;
+	string headerString;
+	string bodyString;
 
-  llvm::raw_string_ostream HeaderOS;
-  llvm::raw_string_ostream BodyOS;
+	llvm::raw_string_ostream HeaderOS;
+	llvm::raw_string_ostream BodyOS;
 
-  OutputStreams() : headerString(&quot;&quot;), bodyString(&quot;&quot;), HeaderOS(headerString), BodyOS(bodyString){};
+	OutputStreams() : headerString(&quot;&quot;), bodyString(&quot;&quot;), HeaderOS(headerString), BodyOS(bodyString){};
 };
 
 
@@ -427,14 +379,14 @@ map&lt;string, int&gt; funcList;
 <p>Next, we write the main function:</p>
 
 <pre><code>int main(int argc, const char **argv) {
-  // parse the command-line args passed to your code
-  CommonOptionsParser op(argc, argv, CPP2CCategory);
-  // create a new Clang Tool instance (a LibTooling environment)
-  ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+	// parse the command-line args passed to your code
+	CommonOptionsParser op(argc, argv, CPP2CCategory);
+	// create a new Clang Tool instance (a LibTooling environment)
+	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 
-  // run the Clang Tool, creating a new FrontendAction
-  return Tool.run(newFrontendActionFactory&lt;MyFrontendAction&gt;().get());
+	// run the Clang Tool, creating a new FrontendAction
+	return Tool.run(newFrontendActionFactory&lt;MyFrontendAction&gt;().get());
 }
 </code></pre>
 
@@ -444,69 +396,75 @@ on.  Thus, it takes a FrontendActionFactory as parameter. To create a <code>Fron
 <pre><code>// For each source file provided to the tool, a new FrontendAction is created.
  class MyFrontendAction: public ASTFrontendAction {
 public:
-  MyFrontendAction() {
-    OS.HeaderOS &lt;&lt; 	&quot;#ifndef UTHREADS_CWRAPPER_H\n&quot;
-    &quot;#define UTHREADS_CWRAPPER_H_\n&quot;
-    &quot;#include &lt;pthread.h&gt;\n&quot;
-    &quot;#include &lt;sys/types.h&gt;\n&quot;
-    &quot;#include &lt;sys/socket.h&gt;\n&quot;
-    &quot;#include &lt;inttypes.h&gt;\n\n&quot;
+	MyFrontendAction() {
+		OS.HeaderOS &lt;&lt; 	&quot;#ifndef UTHREADS_CWRAPPER_H\n&quot;
+						&quot;#define UTHREADS_CWRAPPER_H_\n&quot;
+						&quot;#include &lt;pthread.h&gt;\n&quot;
+						&quot;#include &lt;sys/types.h&gt;\n&quot;
+						&quot;#include &lt;sys/socket.h&gt;\n&quot;
+						&quot;#include &lt;inttypes.h&gt;\n\n&quot;
 
-    &quot;#ifdef __cplusplus\n&quot;
-    &quot;extern \&quot;C\&quot;{\n&quot;
-    &quot;#endif\n&quot;
-    &quot;#include &lt;stdbool.h&gt;\n&quot;;
-    OS.BodyOS &lt;&lt; &quot;#include \&quot;generic/basics.h\&quot;\n&quot;
-    &quot;#include \&quot;cwrapper.h\&quot;\n&quot;
-    &quot;#include \&quot;runtime/uThread.h\&quot;\n&quot;
-    &quot;#include \&quot;runtime/uThreadPool.h\&quot;\n&quot;
-    &quot;#include \&quot;runtime/kThread.h\&quot;\n&quot;
-    &quot;#include \&quot;io/Network.h\&quot;\n&quot;
-    &quot;#ifdef __cplusplus\n&quot;
-    &quot;extern \&quot;C\&quot;{\n&quot;
-    &quot;#endif\n&quot;;
-  }
+						&quot;#ifdef __cplusplus\n&quot;
+						&quot;extern \&quot;C\&quot;{\n&quot;
+						&quot;#endif\n&quot;
+						&quot;#include &lt;stdbool.h&gt;\n&quot;;
+		OS.BodyOS &lt;&lt; &quot;#include \&quot;generic/basics.h\&quot;\n&quot;
+					&quot;#include \&quot;cwrapper.h\&quot;\n&quot;
+					&quot;#include \&quot;runtime/uThread.h\&quot;\n&quot;
+					&quot;#include \&quot;runtime/uThreadPool.h\&quot;\n&quot;
+					&quot;#include \&quot;runtime/kThread.h\&quot;\n&quot;
+					&quot;#include \&quot;io/Network.h\&quot;\n&quot;
+						&quot;#ifdef __cplusplus\n&quot;
+						&quot;extern \&quot;C\&quot;{\n&quot;
+						&quot;#endif\n&quot;;
+
+	}
 
 	void EndSourceFileAction() override {
 
-    StringRef headerFile(&quot;cwrapper.h&quot;);
-    StringRef bodyFile(&quot;cwrapper.cpp&quot;);
+		StringRef headerFile(&quot;cwrapper.h&quot;);
+		StringRef bodyFile(&quot;cwrapper.cpp&quot;);
 
-    // Open the output file
-    std::error_code EC;
-    llvm::raw_fd_ostream HOS(headerFile, EC, llvm::sys::fs::F_None);
-    if (EC) {
-    llvm::errs() &lt;&lt; &quot;while opening '&quot; &lt;&lt; headerFile&lt;&lt; &quot;': &quot; &lt;&lt; EC.message() &lt;&lt; '\n';
-      exit(1);
-    }
-    llvm::raw_fd_ostream BOS(bodyFile, EC, llvm::sys::fs::F_None);
-    if (EC) {
-      llvm::errs() &lt;&lt; &quot;while opening '&quot; &lt;&lt; bodyFile&lt;&lt; &quot;': &quot; &lt;&lt; EC.message() &lt;&lt; '\n';
-      exit(1);
-    }
+        // Open the output file
+        std::error_code EC;
+        llvm::raw_fd_ostream HOS(headerFile, EC, llvm::sys::fs::F_None);
+        if (EC) {
+            llvm::errs() &lt;&lt; &quot;while opening '&quot; &lt;&lt; headerFile&lt;&lt; &quot;': &quot;
+            &lt;&lt; EC.message() &lt;&lt; '\n';
+            exit(1);
+        }
+        llvm::raw_fd_ostream BOS(bodyFile, EC, llvm::sys::fs::F_None);
+        if (EC) {
+            llvm::errs() &lt;&lt; &quot;while opening '&quot; &lt;&lt; bodyFile&lt;&lt; &quot;': &quot;
+            &lt;&lt; EC.message() &lt;&lt; '\n';
+            exit(1);
+        }
 
-    OS.HeaderOS &lt;&lt; &quot;#ifdef __cplusplus\n&quot;
-    &quot;}\n&quot;
-    &quot;#endif\n&quot;
-    &quot;#endif /* UTHREADS_CWRAPPER_H_ */\n&quot;;
 
-    OS.BodyOS&lt;&lt; &quot;#ifdef __cplusplus\n&quot;
-    &quot;}\n&quot;
-    &quot;#endif\n&quot;;
+		OS.HeaderOS &lt;&lt; &quot;#ifdef __cplusplus\n&quot;
+						&quot;}\n&quot;
+						&quot;#endif\n&quot;
+						&quot;#endif /* UTHREADS_CWRAPPER_H_ */\n&quot;;
 
-    OS.HeaderOS.flush();
-    OS.BodyOS.flush();
-    HOS&lt;&lt; OS.headerString &lt;&lt; &quot;\n&quot;;
-    BOS&lt;&lt; OS.bodyString &lt;&lt; &quot;\n&quot;;
+		OS.BodyOS&lt;&lt; &quot;#ifdef __cplusplus\n&quot;
+						&quot;}\n&quot;
+						&quot;#endif\n&quot;;
 
-  }
+		OS.HeaderOS.flush();
+		OS.BodyOS.flush();
+		HOS&lt;&lt; OS.headerString &lt;&lt; &quot;\n&quot;;
+		BOS&lt;&lt; OS.bodyString &lt;&lt; &quot;\n&quot;;
 
-  std::unique_ptr&lt;ASTConsumer&gt; CreateASTConsumer(CompilerInstance &amp;CI, StringRef file) override {
-    return llvm::make_unique&lt;MyASTConsumer&gt;(OS);
-  }
+	}
+
+	std::unique_ptr&lt;ASTConsumer&gt; CreateASTConsumer(CompilerInstance &amp;CI,
+			StringRef file) override {
+
+		return llvm::make_unique&lt;MyASTConsumer&gt;(OS);
+	}
 
 private:
-  OutputStreams OS;
+	OutputStreams OS;
 };
 </code></pre>
 
@@ -517,29 +475,31 @@ private:
 // the AST.
 class MyASTConsumer: public ASTConsumer {
 public:
-  MyASTConsumer(OutputStreams&amp; os) : OS(os),
-    HandlerForClassMatcher(os){
-    // Add a simple matcher for finding 'if' statements.
+	MyASTConsumer(OutputStreams&amp; os) : OS(os),
+			HandlerForClassMatcher(os){
+		// Add a simple matcher for finding 'if' statements.
 
-    for(string&amp; className : ClassList){
-      OS.HeaderOS &lt;&lt; &quot;struct      W&quot;&lt;&lt; className &lt;&lt; &quot;; \n&quot;
-      &quot;typedef     struct W&quot;&lt;&lt; className &lt;&lt; &quot; W&quot;&lt;&lt; className &lt;&lt; &quot;;\n&quot;;
-      //oss.push_back(std::move(os))
+		for(string&amp; className : ClassList){
+			OS.HeaderOS &lt;&lt; &quot;struct      W&quot;&lt;&lt; className &lt;&lt; &quot;; \n&quot;
+						   &quot;typedef     struct W&quot;&lt;&lt; className &lt;&lt; &quot; W&quot;&lt;&lt; className &lt;&lt; &quot;;\n&quot;;
+			//oss.push_back(std::move(os))
 
-      DeclarationMatcher classMatcher = cxxMethodDecl(isPublic(), ofClass(hasName(className))).bind(&quot;publicMethodDecl&quot;);
-      Matcher.addMatcher(classMatcher, &amp;HandlerForClassMatcher);
-    }
-  }
+			DeclarationMatcher classMatcher = cxxMethodDecl(isPublic(), ofClass(hasName(className))).bind(&quot;publicMethodDecl&quot;);
+			Matcher.addMatcher(classMatcher, &amp;HandlerForClassMatcher);
+		}
 
-  void HandleTranslationUnit(ASTContext &amp;Context) override {
-    // Run the matchers when we have the whole TU parsed.
-    Matcher.matchAST(Context);
-  }
+	}
+
+	void HandleTranslationUnit(ASTContext &amp;Context) override {
+		// Run the matchers when we have the whole TU parsed.
+		Matcher.matchAST(Context);
+	}
+
 private:
-  OutputStreams&amp; OS;
-  classMatchHandler HandlerForClassMatcher;
+	OutputStreams&amp; OS;
+	classMatchHandler HandlerForClassMatcher;
 
-  MatchFinder Matcher;
+	MatchFinder Matcher;
 };
 </code></pre>
 
@@ -548,16 +508,16 @@ private:
 <p>Class <code>classMatchHandler</code> is a child of <code>MatchFinder::MatchCallBack</code> class, and is used to perform the required task after a match is found. We also override member function <code>run</code>, that accepts a <code>MatchResult</code> and is called upon finding a match. The first step is to check whether the matched node with the provided string <code>publicMethodDecl</code> is of type <code>cxxMethodDecl</code>.</p>
 
 <pre><code>if (const CXXMethodDecl *cmd = Result.Nodes.getNodeAs&lt;CXXMethodDecl&gt;(&quot;publicMethodDecl&quot;)){
-  string methodName = &quot;&quot;;
-  string className = cmd-&gt;getParent()-&gt;getDeclName().getAsString();
-  string returnType = &quot;&quot;;
-  string returnCast = &quot;&quot;;
-  bool shouldReturn, isPointer;
-  string self = &quot;W&quot; + className + &quot;* self&quot;;
-  string separator = &quot;, &quot;;
-  string bodyEnd = &quot;&quot;;
+			string methodName = &quot;&quot;;
+			string className = cmd-&gt;getParent()-&gt;getDeclName().getAsString();
+			string returnType = &quot;&quot;;
+			string returnCast = &quot;&quot;;
+			bool shouldReturn, isPointer;
+			string self = &quot;W&quot; + className + &quot;* self&quot;;
+			string separator = &quot;, &quot;;
+			string bodyEnd = &quot;&quot;;
 
-  std::stringstream functionBody;
+			std::stringstream functionBody;
 </code></pre>
 
 <p>If so, we create a few of strings variables in order to generate the final C method. <code>className</code> captures the name of the parent class of the method, i.e. the name used to find the method in the matcher, by getting the declaration name of the parent class as string. To map member functions to C, there is a need to send the pointer to the object as the first argument, so the string <code>self</code> contains the string that represents the pointer to the struct in C that is named as <em>self</em>. The rest of the variables are explained later.</p>
@@ -603,22 +563,22 @@ if (const CXXConstructorDecl* ccd = dyn_cast&lt;CXXConstructorDecl&gt;(cmd)) {
 
   //should this function return?
   if(shouldReturn)
-    functionBody &lt;&lt; &quot;return &quot;;
+  	functionBody &lt;&lt; &quot;return &quot;;
 
   if(returnCast != &quot;&quot;){
-    //if not pointer and it needs to be casted, then return the pointer
-    if(!isPointer)
-      functionBody &lt;&lt; &quot;&amp;&quot;;
-    functionBody &lt;&lt; &quot;reinterpret_cast&lt;&quot;&lt;&lt; returnType &lt;&lt; &quot;&gt;(&quot;;
-    bodyEnd += &quot;)&quot;;
+  	//if not pointer and it needs to be casted, then return the pointer
+  	if(!isPointer)
+  		functionBody &lt;&lt; &quot;&amp;&quot;;
+  	functionBody &lt;&lt; &quot;reinterpret_cast&lt;&quot;&lt;&lt; returnType &lt;&lt; &quot;&gt;(&quot;;
+  	bodyEnd += &quot;)&quot;;
   }
 
   //if Static call it properly
   if(cmd-&gt;isStatic())
-    functionBody &lt;&lt;className &lt;&lt; &quot;::&quot; &lt;&lt; cmd-&gt;getNameAsString() &lt;&lt; &quot;(&quot;;
+  	functionBody &lt;&lt;className &lt;&lt; &quot;::&quot; &lt;&lt; cmd-&gt;getNameAsString() &lt;&lt; &quot;(&quot;;
   //if not  use the passed object to call the method
   else
-    functionBody &lt;&lt; &quot;reinterpret_cast&lt;&quot;&lt;&lt;className&lt;&lt;&quot;*&gt;(self)-&gt;&quot; &lt;&lt; cmd-&gt;getNameAsString() &lt;&lt; &quot;(&quot;;
+  	functionBody &lt;&lt; &quot;reinterpret_cast&lt;&quot;&lt;&lt;className&lt;&lt;&quot;*&gt;(self)-&gt;&quot; &lt;&lt; cmd-&gt;getNameAsString() &lt;&lt; &quot;(&quot;;
 
   bodyEnd += &quot;)&quot;;
 }
@@ -644,6 +604,7 @@ if (const CXXConstructorDecl* ccd = dyn_cast&lt;CXXConstructorDecl&gt;(cmd)) {
     string recordName = crd-&gt;getNameAsString();
     CType = &quot;W&quot; + recordName + &quot;*&quot;;
     CastType = recordName+ &quot;*&quot;;
+
   }else if( (qt-&gt;isReferenceType() || qt-&gt;isPointerType()) &amp;&amp; qt-&gt;getPointeeType()-&gt;isRecordType()){
     isPointer = true; //to properly differentiate among cast types
     const CXXRecordDecl* crd = qt-&gt;getPointeeType()-&gt;getAsCXXRecordDecl();
@@ -654,8 +615,10 @@ if (const CXXConstructorDecl* ccd = dyn_cast&lt;CXXConstructorDecl&gt;(cmd)) {
     }else{
       CType = recordName+&quot;*&quot;;
     }
+
   }
   return make_tuple(CType, CastType, isPointer, shoulReturn);
+
 }
 </code></pre>
 

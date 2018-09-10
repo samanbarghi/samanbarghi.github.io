@@ -93,8 +93,7 @@
     </script></p>
     
 
-    <p>Copyright &copy; 2016 <a href="http://samanbarghi.com/license/">License</a><br/>
-       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+    
   </div>
 </div>
 
@@ -110,8 +109,6 @@
     <p>This post is based on <a href="http://muffinresearch.co.uk/archives/2010/02/08/howto-ssh-into-virtualbox-3-linux-guests/" target="_blank">&#8220;Howto: SSH into VirtualBox 3 Linux Guests&#8221;</a> by <a href="http://muffinresearch.co.uk/" target="_blank">Stuart Colville</a>, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.</p>
 
 <p>Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&gt;Adapter 2, then check the &#8220;Enable Network Adapter&#8221; as shown below. Change &#8220;attached to&#8221; to &#8220;Host-only Adapter&#8221; this will have the name vboxnet0 by default.</p>
-
-<p>[<img class="size-full wp-image-143 alignnone" title="VirtualBox-FreeBsd" src="http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png" alt="" width="501" height="397" />][1]</p>
 
 <p>Now if you do <em>ifconfing</em> on your host machine (On Windows hosts use <em>ipconfig</em>), there will be a new interface called *vboxnet0 *(same as the virtual adapter name you just added). You will notice the IP address is something similar to this:</p>
 
@@ -141,12 +138,6 @@
 <p>That&#8217;s it, now you should be able to ssh to your guest machine by:</p>
 
 <pre class="brush: bash; light: true; title: ; notranslate" title="">ssh saman@192.168.56.10 </pre>
-
-<p>.</p>
-
-<p><span class='st\_facebook' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span st\_via='saman\_b' class='st\_twitter' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span class='st\_email' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span class='st\_sharethis' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span class='st\_fblike' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span class='st\_plusone' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span><span class='st\_pinterest' st\_title='SSH to VirtualBox 3 FreeBsd Guests' st_url='http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/'></span></p>
-
-<p>[1]: <a href="http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png">http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png</a></p>
 
   </div>
   <div id="disqus_thread"></div>

@@ -93,8 +93,7 @@
     </script></p>
     
 
-    <p>Copyright &copy; 2016 <a href="http://samanbarghi.com/license/">License</a><br/>
-       Powered by <a href="http://gohugo.io">Hugo</a> and <a href="https://github.com/zyro/hyde-x">Hyde-X</a></p>
+    
   </div>
 </div>
 
@@ -107,7 +106,7 @@
       <h1 class="post-title">
         <a href="http://samanbarghi.com/blog/2016/12/06/generate-c-interface-from-c-source-code-using-clang-libtooling/">Generate C interface from C&#43;&#43; source code using Clang libtooling</a>
       </h1>
-      <span class="post-date">Dec 6, 2016 &middot; 24 minute read &middot; <a href="http://samanbarghi.com/blog/2016/12/06/generate-c-interface-from-c-source-code-using-clang-libtooling/#disqus_thread">Comments</a>
+      <span class="post-date">Dec 6, 2016 &middot; 22 minute read &middot; <a href="http://samanbarghi.com/blog/2016/12/06/generate-c-interface-from-c-source-code-using-clang-libtooling/#disqus_thread">Comments</a>
       
       <br/>
       <a class="label" href="http://samanbarghi.com/categories/clang">clang</a><a class="label" href="http://samanbarghi.com/categories/llvm">llvm</a><a class="label" href="http://samanbarghi.com/categories/c">C</a><a class="label" href="http://samanbarghi.com/categories/c">C&#43;&#43;</a>
@@ -143,7 +142,7 @@
       <a class="label" href="http://samanbarghi.com/categories/geeky">Geeky</a><a class="label" href="http://samanbarghi.com/categories/scripts">Scripts</a>
       </span>
       
-      [][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well.
+      National Geographic&#39;s Photo Of the Day I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well.
       <a href="http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux">Read On &rarr;</a>
       
     </div>
@@ -158,7 +157,7 @@
       <a class="label" href="http://samanbarghi.com/categories/geeky">Geeky</a>
       </span>
       
-      The other day I was about to update my resume, and this crazy question came to my mind: What might my resume look like if I were a computer ? And This was the result. (Best viewed in Chrome and Firefox, if I turn to a computer I will run Unix based systems and IE does not exist in my world). Well, I am aware that I would not wake up one morning finding out I turned into a computer.
+      The other day I was about to update my resume, and this crazy question came to my mind: What might my resume look like if I were a computer ? And This is the result. (Best viewed in Chrome and Firefox). Well, I am aware that I would not wake up one morning finding out I turned into a computer. Also, I am not sure if one day I turn into a computer, I would look for a job.
       <a href="http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer">Read On &rarr;</a>
       
     </div>
@@ -173,7 +172,7 @@
       <a class="label" href="http://samanbarghi.com/categories/uncategorized">Uncategorized</a>
       </span>
       
-      <p>I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions, but they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost)...</p>
+      I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions available (this and this). But they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost): &nbsp; Update your bash profile, add/modify these 3 lines: vim ~/.bash_profile export LD_LIBRARY_PATH=”$HOME/packages/lib:$LD_LIBRARY_PATH” export PYTHONPATH=”$HOME/packages/lib/python2.3/site-packages:$PYTHONPATH” export PATH=”$HOME/packages/bin:$HOME/bin:$PATH” source ~/.bash_profile vim ~/.bashrc PATH=$PATH:$HOME/bin:$HOME/packages/mercurial source ~/.bashrc Create folders (Please note, from now on my assumption is that your web directory is located at $HOME/public_html, please change the related parts if your configuration is different): cd mkdir install_files mkdir packages mkdir ~/public_html/hg mkdir ~/public_html/hg/repos Get Mercurial and install: cd ~/packages wget http://selenic.com/repo/hg-stable/archive/tip.tar.gz tar zxf tip.tar.gz mv tip.tar.gz ~/install_files/ mv Mercurial* mercurial cd mercurial #dont' forget to change the username echo -e &quot;[ui]\nusername=YOURUSERNAME &amp;lt;YOUREMAIL@WEB.com&amp;gt;&quot; &amp;gt; ~/.hgrc﻿ make local ./hg debuginstall Running the last command should not show any problems and you would see : Checking encoding (UTF-8)...
       <a href="http://samanbarghi.com/2011/08/26/mercurial-on-bluehost">Read On &rarr;</a>
       
     </div>

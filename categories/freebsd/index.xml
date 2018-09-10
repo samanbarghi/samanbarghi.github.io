@@ -19,8 +19,6 @@
 
 &lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;
 
-&lt;p&gt;[&lt;img class=&#34;size-full wp-image-143 alignnone&#34; title=&#34;VirtualBox-FreeBsd&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34; alt=&#34;&#34; width=&#34;501&#34; height=&#34;397&#34; /&gt;][1]&lt;/p&gt;
-
 &lt;p&gt;Now if you do &lt;em&gt;ifconfing&lt;/em&gt; on your host machine (On Windows hosts use &lt;em&gt;ipconfig&lt;/em&gt;), there will be a new interface called *vboxnet0 *(same as the virtual adapter name you just added). You will notice the IP address is something similar to this:&lt;/p&gt;
 
 &lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;inet addr:192.168.56.1  Bcast:192.168.56.255  Mask:255.255.255.0&lt;/pre&gt;
@@ -49,12 +47,6 @@
 &lt;p&gt;That&amp;#8217;s it, now you should be able to ssh to your guest machine by:&lt;/p&gt;
 
 &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;ssh saman@192.168.56.10 &lt;/pre&gt;
-
-&lt;p&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     

@@ -37,11 +37,11 @@ extern &amp;quot;C&amp;quot;{
 
 /* Wrapper struct to hold a pointer to
    Rectangle object in C  */
-struct      WRectangle;
+struct      WRectangle;             
 typedef     struct WRectangle WRectangle;
 
 /* Wrapper for the constructor */
-WRectangle*   Rectangle_create(int l, int w);
+WRectangle*   Rectangle_create(int l, int w);     
 /* Wrapper for destructor */
 void  Rectangle_destroy(WRectangle* self);
 /* Wrapper for method area */
@@ -83,7 +83,7 @@ int Rectangle_perimeter(WRectangle* self){
 
 &lt;p&gt;&lt;a href=&#34;http://clang.llvm.org/docs/LibTooling.html&#34;&gt;Clang libtooling&lt;/a&gt; supports writing standalone tools based on Clang. To generate the C interface, I use &lt;a href=&#34;http://clang.llvm.org/docs/LibASTMatchersReference.html&#34;&gt;Clang AST Matcher&lt;/a&gt; to find public methods of specific classes and generate the C functions based on that. To get familiar with Clang AST you can refer to &lt;a href=&#34;http://clang.llvm.org/docs/IntroductionToTheClangAST.html&#34;&gt;this articls&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;For this tool to work, you need LLVM and Clang installed on your system. You can either &lt;a href=&#34;http://clang.llvm.org/get_started.html&#34;&gt;build them from source&lt;/a&gt;, which will take a long time to finish, or you can install precompiled packages for your operating system. I am using Calng version 4.0.0 and LLVM version 4.0.0, but I tested the code with Clang and LLVM v3.8 and it works fine. To install Clang and LLVM under ubuntu issue &lt;code&gt;sudo apt-get install llvm llvm-dev clang&lt;/code&gt; (if installing llvm-3.8 you might want to use to following workaround provided &lt;a href=&#34;https://github.com/iovisor/bcc/issues/492&#34;&gt;here&lt;/a&gt; to make it work).&lt;/p&gt;
+&lt;p&gt;For this tool to work, you need LLVM and Clang installed on your system. You can either &lt;a href=&#34;http://clang.llvm.org/get_started.html&#34;&gt;build them from source&lt;/a&gt;, which will take a long time to finish, or you can install precompiled packages for your operating system. I am using Calng version 4.0.0 and LLVM version 4.0.0, but I tested the code with Clang and LLVM v3.8 and it works fine. To install Clang and LLVM under ubuntu issue &lt;code&gt;sudo apt-get install llvm clang&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;I am going to explain how I used Clang libtooling to generate the cwrapper files for uThreads. The finished code can be found &lt;a href=&#34;https://github.com/samanbarghi/CPP2C&#34;&gt;here&lt;/a&gt;. This is not used to generate the actual cwrapper files under uThreads, as it still needs some improvements before it can be used in production. Before I explain the code, let&amp;rsquo;s go through some rules and issues for generating the cwrapper functions:&lt;/p&gt;
 
@@ -103,66 +103,19 @@ int Rectangle_perimeter(WRectangle* self){
 
 &lt;p&gt;&lt;code&gt;include/uThreads.h&lt;/code&gt; is the file that includes all the header files in uThreads, thus all uThreads classes and functions are present when passing the file to clang. Also, since many stdlib and system files are included the resulting AST is going to be very large, as it covers all the included files as well. Here are AST nodes related to constructor, destructor, and method &lt;code&gt;accept&lt;/code&gt; from class Connection in uThreads:&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;|-CXXConstructorDecl 0x3a4a1f0 &amp;lt;line:87:5, col:75&amp;gt; col:5 Connection &#39;void (int, int, int) throw(std::system_error)&#39;
-| |-ParmVarDecl 0x3a49fd8 &amp;lt;col:16, col:20&amp;gt; col:20 domain &#39;int&#39;
-| |-ParmVarDecl 0x3a4a048 &amp;lt;col:28, col:32&amp;gt; col:32 type &#39;int&#39;
-| |-ParmVarDecl 0x3a4a0b8 &amp;lt;col:38, col:42&amp;gt; col:42 protocol &#39;int&#39;
-| `-FullComment 0x3bc0040 &amp;lt;line:78:7, line:86:5&amp;gt;
-|   |-ParagraphComment 0x3bbfdc0 &amp;lt;line:78:7&amp;gt;
-|   | `-TextComment 0x3bbfd90 &amp;lt;col:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bbfde0 &amp;lt;col:8, line:79:7&amp;gt; Name=&amp;quot;brief&amp;quot;
-|   | `-ParagraphComment 0x3bbfe60 &amp;lt;line:78:14, line:79:7&amp;gt;
-|   |   |-TextComment 0x3bbfe10 &amp;lt;line:78:14, col:65&amp;gt; Text=&amp;quot; Same as socket syscall adds | SOCK_NONBLOCK to type&amp;quot;
-|   |   `-TextComment 0x3bbfe30 &amp;lt;line:79:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bbfe80 &amp;lt;col:8, col:37&amp;gt; Name=&amp;quot;return&amp;quot;
-|   | `-ParagraphComment 0x3bbfee0 &amp;lt;col:15, col:37&amp;gt;
-|   |   `-TextComment 0x3bbfeb0 &amp;lt;col:15, col:37&amp;gt; Text=&amp;quot; same as socket syscall&amp;quot;
-|   |-ParagraphComment 0x3bbffa0 &amp;lt;line:81:7, line:84:29&amp;gt;
-|   | |-TextComment 0x3bbff00 &amp;lt;line:81:7, col:69&amp;gt; Text=&amp;quot; Throws a std::system_error exception. Do not call from C code.&amp;quot;
-|   | |-TextComment 0x3bbff20 &amp;lt;line:82:7, col:68&amp;gt; Text=&amp;quot; The unerlying socket is always nonbelocking. This is achieved&amp;quot;
-|   | |-TextComment 0x3bbff40 &amp;lt;line:83:7, col:60&amp;gt; Text=&amp;quot; by adding a  (| SOCK_NONBLOCK) to type, thus requires&amp;quot;
-|   | `-TextComment 0x3bbff60 &amp;lt;line:84:7, col:29&amp;gt; Text=&amp;quot; linux kernels &amp;gt; 2.6.27&amp;quot;
-|   `-ParagraphComment 0x3bbfff0 &amp;lt;line:86:1, col:5&amp;gt;
-|     `-TextComment 0x3bbffc0 &amp;lt;col:1, col:5&amp;gt; Text=&amp;quot;     &amp;quot;
-|-CXXDestructorDecl 0x3a4a318 &amp;lt;line:89:5, col:17&amp;gt; col:5 ~Connection &#39;void (void)&#39; noexcept-unevaluated 0x3a4a318
-|-CXXMethodDecl 0x3a4a630 &amp;lt;line:99:5, col:75&amp;gt; col:9 accept &#39;int (class Connection *, struct sockaddr *, socklen_t *)&#39;
-| |-ParmVarDecl 0x3a4a408 &amp;lt;col:16, col:28&amp;gt; col:28 conn &#39;class Connection *&#39;
-| |-ParmVarDecl 0x3a4a490 &amp;lt;col:34, col:51&amp;gt; col:51 addr &#39;struct sockaddr *&#39;
-| |-ParmVarDecl 0x3a4a500 &amp;lt;col:57, col:68&amp;gt; col:68 addrlen &#39;socklen_t *&#39;
-| `-FullComment 0x3bc03a0 &amp;lt;line:92:7, line:97:52&amp;gt;
-|   |-ParagraphComment 0x3bc00e0 &amp;lt;line:92:7&amp;gt;
-|   | `-TextComment 0x3bc00b0 &amp;lt;col:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bc0100 &amp;lt;col:8, line:94:7&amp;gt; Name=&amp;quot;brief&amp;quot;
-|   | `-ParagraphComment 0x3bc01b0 &amp;lt;line:92:14, line:94:7&amp;gt;
-|   |   |-TextComment 0x3bc0130 &amp;lt;line:92:14, col:75&amp;gt; Text=&amp;quot; nonblocking accept syscall and updating the passed Connection&amp;quot;
-|   |   |-TextComment 0x3bc0150 &amp;lt;line:93:7, col:13&amp;gt; Text=&amp;quot; object&amp;quot;
-|   |   `-TextComment 0x3bc0170 &amp;lt;line:94:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-ParamCommandComment 0x3bc01d0 &amp;lt;col:8, line:95:7&amp;gt; [in] implicitly Param=&amp;quot;conn&amp;quot; ParamIndex=0
-|   | `-ParagraphComment 0x3bc0280 &amp;lt;line:94:19, line:95:7&amp;gt;
-|   |   |-TextComment 0x3bc0230 &amp;lt;line:94:19, col:73&amp;gt; Text=&amp;quot; Pointer to a Connection object that is not initialized&amp;quot;
-|   |   `-TextComment 0x3bc0250 &amp;lt;line:95:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bc02a0 &amp;lt;col:8, col:41&amp;gt; Name=&amp;quot;return&amp;quot;
-|   | `-ParagraphComment 0x3bc0300 &amp;lt;col:15, col:41&amp;gt;
-|   |   `-TextComment 0x3bc02d0 &amp;lt;col:15, col:41&amp;gt; Text=&amp;quot; same as accept system call&amp;quot;
-|   `-ParagraphComment 0x3bc0350 &amp;lt;line:97:7, col:52&amp;gt;
-|     `-TextComment 0x3bc0320 &amp;lt;col:7, col:52&amp;gt; Text=&amp;quot;  This format is used for compatibility with C&amp;quot;
-|-CXXMethodDecl 0x3a4a8c0 &amp;lt;line:107:5, col:90&amp;gt; col:17 accept &#39;class Connection *(struct sockaddr *, socklen_t *) throw(std::system_error)&#39;
-| |-ParmVarDecl 0x3a4a740 &amp;lt;col:24, col:41&amp;gt; col:41 addr &#39;struct sockaddr *&#39;
-| |-ParmVarDecl 0x3a4a7b0 &amp;lt;col:47, col:58&amp;gt; col:58 addrlen &#39;socklen_t *&#39;
-| `-FullComment 0x3bc05f0 &amp;lt;line:102:7, line:105:72&amp;gt;
-|   |-ParagraphComment 0x3bc0440 &amp;lt;line:102:7&amp;gt;
-|   | `-TextComment 0x3bc0410 &amp;lt;col:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bc0460 &amp;lt;col:8, line:103:7&amp;gt; Name=&amp;quot;brief&amp;quot;
-|   | `-ParagraphComment 0x3bc04e0 &amp;lt;line:102:14, line:103:7&amp;gt;
-|   |   |-TextComment 0x3bc0490 &amp;lt;line:102:14, col:66&amp;gt; Text=&amp;quot; Accepts a connection and returns a connection object&amp;quot;
-|   |   `-TextComment 0x3bc04b0 &amp;lt;line:103:7&amp;gt; Text=&amp;quot; &amp;quot;
-|   |-BlockCommandComment 0x3bc0500 &amp;lt;col:8, col:39&amp;gt; Name=&amp;quot;return&amp;quot;
-|   | `-ParagraphComment 0x3bc0560 &amp;lt;col:15, col:39&amp;gt;
-|   |   `-TextComment 0x3bc0530 &amp;lt;col:15, col:39&amp;gt; Text=&amp;quot; Newly created connection&amp;quot;
-|   `-ParagraphComment 0x3bc05b0 &amp;lt;line:105:7, col:72&amp;gt;
-|     `-TextComment 0x3bc0580 &amp;lt;col:7, col:72&amp;gt; Text=&amp;quot; Throws a std::system_error exception on error. Never call from C.&amp;quot;
-
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;a href=&#34;http://samanbarghi.com/images/2016-12-06/ast-dump.png&#34;&gt;
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://samanbarghi.com/images/2016-12-06/ast-dump.png&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;AST Dump&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;AST node related to constructor is of type &lt;code&gt;CXXConstructorDecl&lt;/code&gt;, AST node related to the destructor is of type &lt;code&gt;CXXDestructorDecl&lt;/code&gt;, and the accept method is of type &lt;code&gt;CXXMethodDecl&lt;/code&gt;. &lt;a href=&#34;http://clang.llvm.org/doxygen/classclang_1_1CXXConstructorDecl.html&#34;&gt;CXXConstructorDecl&lt;/a&gt; and &lt;a href=&#34;http://clang.llvm.org/doxygen/classclang_1_1CXXDestructorDecl.html&#34;&gt;CXXDestructorDecl&lt;/a&gt; are both childern of class &lt;code&gt;CXXMethodDecl&lt;/code&gt;. Hence, by finding all method declarations, i.e. &lt;code&gt;CXXMethodDecl&lt;/code&gt;, in AST we meet all the requirments to generate the C interface.&lt;/p&gt;
 
@@ -317,13 +270,13 @@ static cl::opt&amp;lt;std::string&amp;gt; OutputFilename(&amp;quot;o&amp;quot;, 
 
 &lt;pre&gt;&lt;code&gt;/** Classes to be mapped to C **/
 struct OutputStreams{
-  string headerString;
-  string bodyString;
+	string headerString;
+	string bodyString;
 
-  llvm::raw_string_ostream HeaderOS;
-  llvm::raw_string_ostream BodyOS;
+	llvm::raw_string_ostream HeaderOS;
+	llvm::raw_string_ostream BodyOS;
 
-  OutputStreams() : headerString(&amp;quot;&amp;quot;), bodyString(&amp;quot;&amp;quot;), HeaderOS(headerString), BodyOS(bodyString){};
+	OutputStreams() : headerString(&amp;quot;&amp;quot;), bodyString(&amp;quot;&amp;quot;), HeaderOS(headerString), BodyOS(bodyString){};
 };
 
 
@@ -335,14 +288,14 @@ map&amp;lt;string, int&amp;gt; funcList;
 &lt;p&gt;Next, we write the main function:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;int main(int argc, const char **argv) {
-  // parse the command-line args passed to your code
-  CommonOptionsParser op(argc, argv, CPP2CCategory);
-  // create a new Clang Tool instance (a LibTooling environment)
-  ClangTool Tool(op.getCompilations(), op.getSourcePathList());
+	// parse the command-line args passed to your code
+	CommonOptionsParser op(argc, argv, CPP2CCategory);
+	// create a new Clang Tool instance (a LibTooling environment)
+	ClangTool Tool(op.getCompilations(), op.getSourcePathList());
 
 
-  // run the Clang Tool, creating a new FrontendAction
-  return Tool.run(newFrontendActionFactory&amp;lt;MyFrontendAction&amp;gt;().get());
+	// run the Clang Tool, creating a new FrontendAction
+	return Tool.run(newFrontendActionFactory&amp;lt;MyFrontendAction&amp;gt;().get());
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -352,69 +305,75 @@ on.  Thus, it takes a FrontendActionFactory as parameter. To create a &lt;code&g
 &lt;pre&gt;&lt;code&gt;// For each source file provided to the tool, a new FrontendAction is created.
  class MyFrontendAction: public ASTFrontendAction {
 public:
-  MyFrontendAction() {
-    OS.HeaderOS &amp;lt;&amp;lt; 	&amp;quot;#ifndef UTHREADS_CWRAPPER_H\n&amp;quot;
-    &amp;quot;#define UTHREADS_CWRAPPER_H_\n&amp;quot;
-    &amp;quot;#include &amp;lt;pthread.h&amp;gt;\n&amp;quot;
-    &amp;quot;#include &amp;lt;sys/types.h&amp;gt;\n&amp;quot;
-    &amp;quot;#include &amp;lt;sys/socket.h&amp;gt;\n&amp;quot;
-    &amp;quot;#include &amp;lt;inttypes.h&amp;gt;\n\n&amp;quot;
+	MyFrontendAction() {
+		OS.HeaderOS &amp;lt;&amp;lt; 	&amp;quot;#ifndef UTHREADS_CWRAPPER_H\n&amp;quot;
+						&amp;quot;#define UTHREADS_CWRAPPER_H_\n&amp;quot;
+						&amp;quot;#include &amp;lt;pthread.h&amp;gt;\n&amp;quot;
+						&amp;quot;#include &amp;lt;sys/types.h&amp;gt;\n&amp;quot;
+						&amp;quot;#include &amp;lt;sys/socket.h&amp;gt;\n&amp;quot;
+						&amp;quot;#include &amp;lt;inttypes.h&amp;gt;\n\n&amp;quot;
 
-    &amp;quot;#ifdef __cplusplus\n&amp;quot;
-    &amp;quot;extern \&amp;quot;C\&amp;quot;{\n&amp;quot;
-    &amp;quot;#endif\n&amp;quot;
-    &amp;quot;#include &amp;lt;stdbool.h&amp;gt;\n&amp;quot;;
-    OS.BodyOS &amp;lt;&amp;lt; &amp;quot;#include \&amp;quot;generic/basics.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#include \&amp;quot;cwrapper.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#include \&amp;quot;runtime/uThread.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#include \&amp;quot;runtime/uThreadPool.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#include \&amp;quot;runtime/kThread.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#include \&amp;quot;io/Network.h\&amp;quot;\n&amp;quot;
-    &amp;quot;#ifdef __cplusplus\n&amp;quot;
-    &amp;quot;extern \&amp;quot;C\&amp;quot;{\n&amp;quot;
-    &amp;quot;#endif\n&amp;quot;;
-  }
+						&amp;quot;#ifdef __cplusplus\n&amp;quot;
+						&amp;quot;extern \&amp;quot;C\&amp;quot;{\n&amp;quot;
+						&amp;quot;#endif\n&amp;quot;
+						&amp;quot;#include &amp;lt;stdbool.h&amp;gt;\n&amp;quot;;
+		OS.BodyOS &amp;lt;&amp;lt; &amp;quot;#include \&amp;quot;generic/basics.h\&amp;quot;\n&amp;quot;
+					&amp;quot;#include \&amp;quot;cwrapper.h\&amp;quot;\n&amp;quot;
+					&amp;quot;#include \&amp;quot;runtime/uThread.h\&amp;quot;\n&amp;quot;
+					&amp;quot;#include \&amp;quot;runtime/uThreadPool.h\&amp;quot;\n&amp;quot;
+					&amp;quot;#include \&amp;quot;runtime/kThread.h\&amp;quot;\n&amp;quot;
+					&amp;quot;#include \&amp;quot;io/Network.h\&amp;quot;\n&amp;quot;
+						&amp;quot;#ifdef __cplusplus\n&amp;quot;
+						&amp;quot;extern \&amp;quot;C\&amp;quot;{\n&amp;quot;
+						&amp;quot;#endif\n&amp;quot;;
+
+	}
 
 	void EndSourceFileAction() override {
 
-    StringRef headerFile(&amp;quot;cwrapper.h&amp;quot;);
-    StringRef bodyFile(&amp;quot;cwrapper.cpp&amp;quot;);
+		StringRef headerFile(&amp;quot;cwrapper.h&amp;quot;);
+		StringRef bodyFile(&amp;quot;cwrapper.cpp&amp;quot;);
 
-    // Open the output file
-    std::error_code EC;
-    llvm::raw_fd_ostream HOS(headerFile, EC, llvm::sys::fs::F_None);
-    if (EC) {
-    llvm::errs() &amp;lt;&amp;lt; &amp;quot;while opening &#39;&amp;quot; &amp;lt;&amp;lt; headerFile&amp;lt;&amp;lt; &amp;quot;&#39;: &amp;quot; &amp;lt;&amp;lt; EC.message() &amp;lt;&amp;lt; &#39;\n&#39;;
-      exit(1);
-    }
-    llvm::raw_fd_ostream BOS(bodyFile, EC, llvm::sys::fs::F_None);
-    if (EC) {
-      llvm::errs() &amp;lt;&amp;lt; &amp;quot;while opening &#39;&amp;quot; &amp;lt;&amp;lt; bodyFile&amp;lt;&amp;lt; &amp;quot;&#39;: &amp;quot; &amp;lt;&amp;lt; EC.message() &amp;lt;&amp;lt; &#39;\n&#39;;
-      exit(1);
-    }
+        // Open the output file
+        std::error_code EC;
+        llvm::raw_fd_ostream HOS(headerFile, EC, llvm::sys::fs::F_None);
+        if (EC) {
+            llvm::errs() &amp;lt;&amp;lt; &amp;quot;while opening &#39;&amp;quot; &amp;lt;&amp;lt; headerFile&amp;lt;&amp;lt; &amp;quot;&#39;: &amp;quot;
+            &amp;lt;&amp;lt; EC.message() &amp;lt;&amp;lt; &#39;\n&#39;;
+            exit(1);
+        }
+        llvm::raw_fd_ostream BOS(bodyFile, EC, llvm::sys::fs::F_None);
+        if (EC) {
+            llvm::errs() &amp;lt;&amp;lt; &amp;quot;while opening &#39;&amp;quot; &amp;lt;&amp;lt; bodyFile&amp;lt;&amp;lt; &amp;quot;&#39;: &amp;quot;
+            &amp;lt;&amp;lt; EC.message() &amp;lt;&amp;lt; &#39;\n&#39;;
+            exit(1);
+        }
 
-    OS.HeaderOS &amp;lt;&amp;lt; &amp;quot;#ifdef __cplusplus\n&amp;quot;
-    &amp;quot;}\n&amp;quot;
-    &amp;quot;#endif\n&amp;quot;
-    &amp;quot;#endif /* UTHREADS_CWRAPPER_H_ */\n&amp;quot;;
 
-    OS.BodyOS&amp;lt;&amp;lt; &amp;quot;#ifdef __cplusplus\n&amp;quot;
-    &amp;quot;}\n&amp;quot;
-    &amp;quot;#endif\n&amp;quot;;
+		OS.HeaderOS &amp;lt;&amp;lt; &amp;quot;#ifdef __cplusplus\n&amp;quot;
+						&amp;quot;}\n&amp;quot;
+						&amp;quot;#endif\n&amp;quot;
+						&amp;quot;#endif /* UTHREADS_CWRAPPER_H_ */\n&amp;quot;;
 
-    OS.HeaderOS.flush();
-    OS.BodyOS.flush();
-    HOS&amp;lt;&amp;lt; OS.headerString &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
-    BOS&amp;lt;&amp;lt; OS.bodyString &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+		OS.BodyOS&amp;lt;&amp;lt; &amp;quot;#ifdef __cplusplus\n&amp;quot;
+						&amp;quot;}\n&amp;quot;
+						&amp;quot;#endif\n&amp;quot;;
 
-  }
+		OS.HeaderOS.flush();
+		OS.BodyOS.flush();
+		HOS&amp;lt;&amp;lt; OS.headerString &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
+		BOS&amp;lt;&amp;lt; OS.bodyString &amp;lt;&amp;lt; &amp;quot;\n&amp;quot;;
 
-  std::unique_ptr&amp;lt;ASTConsumer&amp;gt; CreateASTConsumer(CompilerInstance &amp;amp;CI, StringRef file) override {
-    return llvm::make_unique&amp;lt;MyASTConsumer&amp;gt;(OS);
-  }
+	}
+
+	std::unique_ptr&amp;lt;ASTConsumer&amp;gt; CreateASTConsumer(CompilerInstance &amp;amp;CI,
+			StringRef file) override {
+
+		return llvm::make_unique&amp;lt;MyASTConsumer&amp;gt;(OS);
+	}
 
 private:
-  OutputStreams OS;
+	OutputStreams OS;
 };
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -425,29 +384,31 @@ private:
 // the AST.
 class MyASTConsumer: public ASTConsumer {
 public:
-  MyASTConsumer(OutputStreams&amp;amp; os) : OS(os),
-    HandlerForClassMatcher(os){
-    // Add a simple matcher for finding &#39;if&#39; statements.
+	MyASTConsumer(OutputStreams&amp;amp; os) : OS(os),
+			HandlerForClassMatcher(os){
+		// Add a simple matcher for finding &#39;if&#39; statements.
 
-    for(string&amp;amp; className : ClassList){
-      OS.HeaderOS &amp;lt;&amp;lt; &amp;quot;struct      W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot;; \n&amp;quot;
-      &amp;quot;typedef     struct W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot; W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot;;\n&amp;quot;;
-      //oss.push_back(std::move(os))
+		for(string&amp;amp; className : ClassList){
+			OS.HeaderOS &amp;lt;&amp;lt; &amp;quot;struct      W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot;; \n&amp;quot;
+						   &amp;quot;typedef     struct W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot; W&amp;quot;&amp;lt;&amp;lt; className &amp;lt;&amp;lt; &amp;quot;;\n&amp;quot;;
+			//oss.push_back(std::move(os))
 
-      DeclarationMatcher classMatcher = cxxMethodDecl(isPublic(), ofClass(hasName(className))).bind(&amp;quot;publicMethodDecl&amp;quot;);
-      Matcher.addMatcher(classMatcher, &amp;amp;HandlerForClassMatcher);
-    }
-  }
+			DeclarationMatcher classMatcher = cxxMethodDecl(isPublic(), ofClass(hasName(className))).bind(&amp;quot;publicMethodDecl&amp;quot;);
+			Matcher.addMatcher(classMatcher, &amp;amp;HandlerForClassMatcher);
+		}
 
-  void HandleTranslationUnit(ASTContext &amp;amp;Context) override {
-    // Run the matchers when we have the whole TU parsed.
-    Matcher.matchAST(Context);
-  }
+	}
+
+	void HandleTranslationUnit(ASTContext &amp;amp;Context) override {
+		// Run the matchers when we have the whole TU parsed.
+		Matcher.matchAST(Context);
+	}
+
 private:
-  OutputStreams&amp;amp; OS;
-  classMatchHandler HandlerForClassMatcher;
+	OutputStreams&amp;amp; OS;
+	classMatchHandler HandlerForClassMatcher;
 
-  MatchFinder Matcher;
+	MatchFinder Matcher;
 };
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -456,16 +417,16 @@ private:
 &lt;p&gt;Class &lt;code&gt;classMatchHandler&lt;/code&gt; is a child of &lt;code&gt;MatchFinder::MatchCallBack&lt;/code&gt; class, and is used to perform the required task after a match is found. We also override member function &lt;code&gt;run&lt;/code&gt;, that accepts a &lt;code&gt;MatchResult&lt;/code&gt; and is called upon finding a match. The first step is to check whether the matched node with the provided string &lt;code&gt;publicMethodDecl&lt;/code&gt; is of type &lt;code&gt;cxxMethodDecl&lt;/code&gt;.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;if (const CXXMethodDecl *cmd = Result.Nodes.getNodeAs&amp;lt;CXXMethodDecl&amp;gt;(&amp;quot;publicMethodDecl&amp;quot;)){
-  string methodName = &amp;quot;&amp;quot;;
-  string className = cmd-&amp;gt;getParent()-&amp;gt;getDeclName().getAsString();
-  string returnType = &amp;quot;&amp;quot;;
-  string returnCast = &amp;quot;&amp;quot;;
-  bool shouldReturn, isPointer;
-  string self = &amp;quot;W&amp;quot; + className + &amp;quot;* self&amp;quot;;
-  string separator = &amp;quot;, &amp;quot;;
-  string bodyEnd = &amp;quot;&amp;quot;;
+			string methodName = &amp;quot;&amp;quot;;
+			string className = cmd-&amp;gt;getParent()-&amp;gt;getDeclName().getAsString();
+			string returnType = &amp;quot;&amp;quot;;
+			string returnCast = &amp;quot;&amp;quot;;
+			bool shouldReturn, isPointer;
+			string self = &amp;quot;W&amp;quot; + className + &amp;quot;* self&amp;quot;;
+			string separator = &amp;quot;, &amp;quot;;
+			string bodyEnd = &amp;quot;&amp;quot;;
 
-  std::stringstream functionBody;
+			std::stringstream functionBody;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;If so, we create a few of strings variables in order to generate the final C method. &lt;code&gt;className&lt;/code&gt; captures the name of the parent class of the method, i.e. the name used to find the method in the matcher, by getting the declaration name of the parent class as string. To map member functions to C, there is a need to send the pointer to the object as the first argument, so the string &lt;code&gt;self&lt;/code&gt; contains the string that represents the pointer to the struct in C that is named as &lt;em&gt;self&lt;/em&gt;. The rest of the variables are explained later.&lt;/p&gt;
@@ -511,22 +472,22 @@ if (const CXXConstructorDecl* ccd = dyn_cast&amp;lt;CXXConstructorDecl&amp;gt;(c
 
   //should this function return?
   if(shouldReturn)
-    functionBody &amp;lt;&amp;lt; &amp;quot;return &amp;quot;;
+  	functionBody &amp;lt;&amp;lt; &amp;quot;return &amp;quot;;
 
   if(returnCast != &amp;quot;&amp;quot;){
-    //if not pointer and it needs to be casted, then return the pointer
-    if(!isPointer)
-      functionBody &amp;lt;&amp;lt; &amp;quot;&amp;amp;&amp;quot;;
-    functionBody &amp;lt;&amp;lt; &amp;quot;reinterpret_cast&amp;lt;&amp;quot;&amp;lt;&amp;lt; returnType &amp;lt;&amp;lt; &amp;quot;&amp;gt;(&amp;quot;;
-    bodyEnd += &amp;quot;)&amp;quot;;
+  	//if not pointer and it needs to be casted, then return the pointer
+  	if(!isPointer)
+  		functionBody &amp;lt;&amp;lt; &amp;quot;&amp;amp;&amp;quot;;
+  	functionBody &amp;lt;&amp;lt; &amp;quot;reinterpret_cast&amp;lt;&amp;quot;&amp;lt;&amp;lt; returnType &amp;lt;&amp;lt; &amp;quot;&amp;gt;(&amp;quot;;
+  	bodyEnd += &amp;quot;)&amp;quot;;
   }
 
   //if Static call it properly
   if(cmd-&amp;gt;isStatic())
-    functionBody &amp;lt;&amp;lt;className &amp;lt;&amp;lt; &amp;quot;::&amp;quot; &amp;lt;&amp;lt; cmd-&amp;gt;getNameAsString() &amp;lt;&amp;lt; &amp;quot;(&amp;quot;;
+  	functionBody &amp;lt;&amp;lt;className &amp;lt;&amp;lt; &amp;quot;::&amp;quot; &amp;lt;&amp;lt; cmd-&amp;gt;getNameAsString() &amp;lt;&amp;lt; &amp;quot;(&amp;quot;;
   //if not  use the passed object to call the method
   else
-    functionBody &amp;lt;&amp;lt; &amp;quot;reinterpret_cast&amp;lt;&amp;quot;&amp;lt;&amp;lt;className&amp;lt;&amp;lt;&amp;quot;*&amp;gt;(self)-&amp;gt;&amp;quot; &amp;lt;&amp;lt; cmd-&amp;gt;getNameAsString() &amp;lt;&amp;lt; &amp;quot;(&amp;quot;;
+  	functionBody &amp;lt;&amp;lt; &amp;quot;reinterpret_cast&amp;lt;&amp;quot;&amp;lt;&amp;lt;className&amp;lt;&amp;lt;&amp;quot;*&amp;gt;(self)-&amp;gt;&amp;quot; &amp;lt;&amp;lt; cmd-&amp;gt;getNameAsString() &amp;lt;&amp;lt; &amp;quot;(&amp;quot;;
 
   bodyEnd += &amp;quot;)&amp;quot;;
 }
@@ -552,6 +513,7 @@ if (const CXXConstructorDecl* ccd = dyn_cast&amp;lt;CXXConstructorDecl&amp;gt;(c
     string recordName = crd-&amp;gt;getNameAsString();
     CType = &amp;quot;W&amp;quot; + recordName + &amp;quot;*&amp;quot;;
     CastType = recordName+ &amp;quot;*&amp;quot;;
+
   }else if( (qt-&amp;gt;isReferenceType() || qt-&amp;gt;isPointerType()) &amp;amp;&amp;amp; qt-&amp;gt;getPointeeType()-&amp;gt;isRecordType()){
     isPointer = true; //to properly differentiate among cast types
     const CXXRecordDecl* crd = qt-&amp;gt;getPointeeType()-&amp;gt;getAsCXXRecordDecl();
@@ -562,8 +524,10 @@ if (const CXXConstructorDecl* ccd = dyn_cast&amp;lt;CXXConstructorDecl&amp;gt;(c
     }else{
       CType = recordName+&amp;quot;*&amp;quot;;
     }
+
   }
   return make_tuple(CType, CastType, isPointer, shoulReturn);
+
 }
 &lt;/code&gt;&lt;/pre&gt;
 
@@ -995,7 +959,21 @@ Hello, World!
       <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
       <description>
 
-&lt;p&gt;[&lt;img class=&#34;wp-image-252 alignleft&#34; title=&#34;National Geographic Photo Of the Day&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721-300x225.jpg&#34; alt=&#34;National Geographic Photo Of the Day&#34; width=&#34;300&#34; height=&#34;225&#34; /&gt;][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://samanbarghi.com/images/ngh-photo.jpg&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;National Geographic&amp;#39;s Photo Of the Day&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+
+&lt;p&gt;I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;a title=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; target=&#34;_blank&#34;&gt;&lt;a href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34;&gt;https://github.com/samanbarghi/ngphotodownloader&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
@@ -1024,8 +1002,6 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Enjoy! &lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1037,10 +1013,10 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
       <guid>http://samanbarghi.com/2012/05/21/what-might-my-resume-look-like-if-i-were-a-computer</guid>
       <description>
 
-&lt;p&gt;The other day I was about to update my resume, and this crazy question came to my mind:&lt;br /&gt;
+&lt;p&gt;The other day I was about to update my resume, and this crazy question came to my mind:
 &lt;strong&gt;What might my resume look like if I were a computer ?&lt;/strong&gt;&lt;/p&gt;
 
-&lt;p&gt;And &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am Computer&#34;&gt;This was the result.&lt;/a&gt; (Best viewed in Chrome and Firefox, if I turn to a computer I will run Unix based systems and IE does not exist in my world).&lt;/p&gt;
+&lt;p&gt;And &lt;a href=&#34;http://samanbarghi.com/memresume/&#34;&gt;This is the result.&lt;/a&gt; (Best viewed in Chrome and Firefox).&lt;/p&gt;
 
 &lt;p&gt;Well, I am aware that I would not wake up one morning finding out I turned into a computer. Also, I am not sure if one day I turn into a computer, I would look for a job. It is not unexpected that someday robots apply for jobs:&lt;/p&gt;
 
@@ -1048,13 +1024,13 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
 &lt;p&gt;I am an intel-based robot with 128 cores, 2 extra GPUs and lots and lots of storage. Great at multi-tasking, equipped with state of the art AI technologies; can adapt to any environment and a quick learner. I also have teleportation abilities, but the module is missing so you have to buy the module and train me to do that. Originally designed to compose and play music, but I also can cook, clean and do programming.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;h2 id=&#34;here-is-how-i-came-up-with-me-as-a-computer-resume-2:4b9a2f0cc21d2fa557cbbde11ed224e0&#34;&gt;Here is how I came up with &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am a Computer&#34;&gt;me as a computer resume&lt;/a&gt;:&lt;/h2&gt;
+&lt;h2 id=&#34;here-is-how-i-came-up-with-me-as-a-computer-resume-memresume:4b9a2f0cc21d2fa557cbbde11ed224e0&#34;&gt;Here is how I came up with &lt;a href=&#34;http://samanbarghi.com/memresume/&#34;&gt;me as a computer resume&lt;/a&gt;:&lt;/h2&gt;
 
 &lt;p&gt;Lets see how a computer do it&amp;#8217;s job from inside out. In the heart of the computer, there lays CPU which does most of the hard work and it defines the base characteristics of the system. Frequency, Processing units, Registers, Memory management, and etc. If I were a computer, I would ask myself: What are my core features that are defining my characteristics? In human world, it translates to very basic human characteristics and personality. Being a team player, public speaker, GTD type of person, Introvert, active, passive, and so on. Basically, I question the way I define myself. This will be the core of the system.&lt;/p&gt;
 
-&lt;p&gt;In addition, one important part of the computer systems is the &lt;a href=&#34;http://en.wikipedia.org/wiki/Memory_hierarchy&#34;&gt;memory hierarchy&lt;/a&gt;. to simplify things, lets assume memory hierarchy only consists of Hard Drive, RAM and processor caches (L1, L2 and L3) . Each core has access to all these memory elements, and the difference is the time it takes for the core to access each of them. At the very top of the hierarchy we have Level 1 Cache (L1), which has a very fast access time but it comes in very small size. As we move down the hierarchy (L2 -&amp;gt; L3 -&amp;gt; RAM), the access time gets longer and the size of the memory becomes bigger. It means the lower the memory element is in the hierarchy, the more time CPU has to spend to fetch the data from that element.&lt;/p&gt;
+&lt;p&gt;In addition, one important part of the computer systems is the [memory hierarchy][1]. to simplify things, lets assume memory hierarchy only consists of Hard Drive, RAM and processor caches (L1, L2 and L3) . Each core has access to all these memory elements, and the difference is the time it takes for the core to access each of them. At the very top of the hierarchy we have Level 1 Cache (L1), which has a very fast access time but it comes in very small size. As we move down the hierarchy (L2 -&amp;gt; L3 -&amp;gt; RAM), the access time gets longer and the size of the memory becomes bigger. It means the lower the memory element is in the hierarchy, the more time CPU has to spend to fetch the data from that element.&lt;/p&gt;
 
-&lt;p&gt;[&lt;img src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi-300x260.gif&#34; alt=&#34;&#34; title=&#34;mem_hi&#34; width=&#34;300&#34; height=&#34;260&#34; class=&#34;aligncenter size-medium wp-image-228&#34; style=&#34;margin:auto&#34; /&gt;][4]&lt;br /&gt;
+&lt;p&gt;&lt;img src=&#34;http://samanbarghi.com/images/ComputerMemoryHierarchy.svg&#34; alt=&#34;Memory Hierarchy&#34; /&gt;
 But how does this all work together? Well there is a concept called temporal locality (also there exists Spatial Locality which is not related to me being a computer !!), it means the most recent data being used at a certain point in time should be closer to the core of the system. Because this data will most probably be used in the near future. So recently used data can be accessed faster, and since most probably it will be accessed in the near future again, it makes the system works faster by removing the accessing cost to that data. For it to work, the CPU moves the data it needs to access at a certain point in time from RAM to each cache level based on recency of the data. So data in L1 is being served at the moment, and data in L3 has been accessed a while ago.&lt;/p&gt;
 
 &lt;p&gt;If we look closely, the same concept applies in our lives. In my case, there are skills and programming languages which I am actively using right now in various projects. The cost of accessing those skills for me is almost zero (My L1 cache as a computer). However, there are a couple of programming languages and technologies that I am using along with L1 skills and they are being accessed frequently as well. The cost to activate those skills is very small but not zero. There are also some programming languages I used during the past years, or I have played with them a while ago, and the price of activating them for me will be to read some documents, write some sample programs and it takes time for me to get comfortable with them again. Those stuff fits into my L3 cache. RAM normally holds the data related to the processes running in a CPU, and in human world I translate them to the general skills that are in there and can be loaded to caches anytime. Web development, mobile app development, these are general info that float in my RAM ! I talk about the hard drive in a bit.&lt;/p&gt;
@@ -1063,9 +1039,9 @@ But how does this all work together? Well there is a concept called temporal loc
 
 &lt;p&gt;Another device that attaches to the mainboard, is hard drive. Hard drive is for storing a whole bunch of data, and it&amp;#8217;s external to the mainboard. Photos, Videos, Documents and programs reside in the Hard Drive. There are various types of data in the hard-drive, but not all are related to the job I (as a computer) am applying for. The whole system has already loaded what is required for a job in the RAM and caches. What left is all other none-related data, which can be loaded at the times I am not applying for jobs or doing a job ! In human world, I say all the interests, hobbies, and activities that are not related to their jobs are stored in the hard drive. Although, this is not related to the job itself, but it can demonstrate how interesting a person is.&lt;/p&gt;
 
-&lt;p&gt;I applied the rules above to myself and came up with &lt;a href=&#34;http://samanbarghi.com/resume/&#34; title=&#34;I am a Computer&#34;&gt;me as a computer resume&lt;/a&gt;. If someone take a look at this resume, by one look they know if they are interested in what I am doing or not. So the real question is not whether one day I turn into a computer or not, it is why in 21st century most resumes are still flat lists and lack a specific hierarchy? I would be bored looking at hundreds of flat listed resumes each having pages and pages of information, I would be happy to hear from other peoples&amp;#8217;s point of view? Although there are some really creative resume designs out there, what would be your suggestion to change the way most people present their resume !? What would your resume look like if you wanted to think out of the box!? What type of info helps HR and hiring staff evaluate a resume better? is there any research going on this subject?&lt;/p&gt;
+&lt;p&gt;I applied the rules above to myself and came up with &lt;a href=&#34;http://samanbarghi.com/memresume/&#34;&gt;me as a computer resume&lt;/a&gt;. If someone take a look at this resume, by one look they know if they are interested in what I am doing or not. So the real question is not whether one day I turn into a computer or not, it is why in 21st century most resumes are still flat lists and lack a specific hierarchy? I would be bored looking at hundreds of flat listed resumes each having pages and pages of information, I would be happy to hear from other peoples&amp;#8217;s point of view? Although there are some really creative resume designs out there, what would be your suggestion to change the way most people present their resume !? What would your resume look like if you wanted to think out of the box!? What type of info helps HR and hiring staff evaluate a resume better? is there any research going on this subject?&lt;/p&gt;
 
-&lt;p&gt;[4]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi.gif&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2012/05/mem_hi.gif&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;[1]: &lt;a href=&#34;http://en.wikipedia.org/wiki/Memory_hierarchy&#34;&gt;http://en.wikipedia.org/wiki/Memory_hierarchy&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1222,8 +1198,6 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
 
 &lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;
 
-&lt;p&gt;[&lt;img class=&#34;size-full wp-image-143 alignnone&#34; title=&#34;VirtualBox-FreeBsd&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34; alt=&#34;&#34; width=&#34;501&#34; height=&#34;397&#34; /&gt;][1]&lt;/p&gt;
-
 &lt;p&gt;Now if you do &lt;em&gt;ifconfing&lt;/em&gt; on your host machine (On Windows hosts use &lt;em&gt;ipconfig&lt;/em&gt;), there will be a new interface called *vboxnet0 *(same as the virtual adapter name you just added). You will notice the IP address is something similar to this:&lt;/p&gt;
 
 &lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;inet addr:192.168.56.1  Bcast:192.168.56.255  Mask:255.255.255.0&lt;/pre&gt;
@@ -1252,12 +1226,6 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
 &lt;p&gt;That&amp;#8217;s it, now you should be able to ssh to your guest machine by:&lt;/p&gt;
 
 &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;ssh saman@192.168.56.10 &lt;/pre&gt;
-
-&lt;p&gt;.&lt;/p&gt;
-
-&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;SSH to VirtualBox 3 FreeBsd Guests&#39; st_url=&#39;http://www.samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2011/02/VirtualBox-FreeBsd.png&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
@@ -1318,7 +1286,7 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
 
 &lt;p&gt;The main question here is how to detect these moments ? How to stay in touch with reality all the time and keep emotions away? What should you do after you detected you trapped in a box? how can you see outside of the box with your own power and without getting any help from someone else? What will be the possible practice to strengthen this ability?&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;EDIT:&lt;/strong&gt; It seems that this issue is more serious than I thought: &lt;a href=&#34;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&#34;&gt;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;EDIT:&lt;/strong&gt; Also, check the following: &lt;a href=&#34;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&#34;&gt;http://www.newyorker.com/online/blogs/frontal-cortex/2012/06/daniel-kahneman-bias-studies.html&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;Rationality&#39; st_url=&#39;http://www.samanbarghi.com/2010/04/12/rationality/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
 </description>
@@ -1362,30 +1330,31 @@ echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos
 &lt;li&gt;&lt;p&gt;Install depot_tools&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;svn co http://src.chromium.org/svn/trunk/tools/depot_tools &lt;/pre&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;code&gt;svn co http://src.chromium.org/svn/trunk/tools/depot_tools&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Add depot_tools to your PATH: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;$ export PATH=&lt;code&gt;pwd&lt;/code&gt;/depot_tools:&amp;ldquo;$PATH&amp;rdquo; &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Add depot_tools to your PATH:
+&lt;code&gt;$ export PATH=`pwd`/depot_tools:&amp;quot;$PATH&amp;quot;&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Updating your checkout once by running &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;gclient sync &amp;ndash;force &lt;/pre&gt;&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;Updating your checkout once by running &lt;code&gt;gclient sync --force&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;span style=&#34;font-family: arial,sans-serif;&#34;&gt; in the source code directory (~/chromium/src). It is important to include the &amp;#8216;&amp;#8211;force&amp;#8217; option as I was getting this message: &lt;/span&gt;&lt;/p&gt;
 
-&lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py&#39;, needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c&#39;. Stop.&#34; &lt;/pre&gt;
+&lt;p&gt;&lt;code&gt;make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py&#39;, needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c&#39;. Stop.&amp;quot;&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;span style=&#34;font-family: arial,sans-serif;&#34;&gt;over and over again since I forgot to include the &lt;tt&gt;&amp;ndash;force&lt;/tt&gt; option. It seems that this command generate platform-specific files&lt;/span&gt;&lt;/li&gt;&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt; ensure that you have &lt;tt&gt;GYP_GENERATORS=make&lt;/tt&gt; in your environment before running &lt;tt&gt;gclient sync&lt;/tt&gt; or &lt;tt&gt;gclient runhooks &amp;ndash;force&lt;/tt&gt;. This tells the Chromium build system to output Makefiles. Example: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;export GYP_GENERATORS=make
-gclient sync&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;&lt;strong&gt;Important:&lt;/strong&gt; ensure that you have &lt;tt&gt;GYP_GENERATORS=make&lt;/tt&gt; in your environment before running &lt;tt&gt;gclient sync&lt;/tt&gt; or &lt;tt&gt;gclient runhooks &amp;ndash;force&lt;/tt&gt;. This tells the Chromium build system to output Makefiles. Example: &lt;code&gt;export GYP_GENERATORS=make
+gclient sync&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Take this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file &lt;tt&gt;chrome/common/chrome_constants.cc &lt;/tt&gt;- change the line which reads &lt;pre class=&#34;brush: cpp; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;kRecordModeEnabled = false&lt;/pre&gt;&lt;/p&gt;
+&lt;li&gt;&lt;p&gt;Take this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file &lt;tt&gt;chrome/common/chrome_constants.cc &lt;/tt&gt;- change the line which reads &lt;code&gt;kRecordModeEnabled = false&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;to&lt;/p&gt;
 
-&lt;pre class=&#34;brush: cpp; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;kRecordModeEnabled = true&lt;/pre&gt;&lt;/li&gt;
+&lt;p&gt;&lt;code&gt;kRecordModeEnabled = true&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;Go to the source directory and write (if you are using a multiple-core machine use &lt;tt&gt;-jX&lt;/tt&gt;, where &lt;tt&gt;X&lt;/tt&gt; is the number of make processes to startup): &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make chrome &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Go to the source directory and write (if you are using a multiple-core machine use &lt;tt&gt;-jX&lt;/tt&gt;, where &lt;tt&gt;X&lt;/tt&gt; is the number of make processes to startup): &lt;code&gt;make chrome&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;You can find the executable in &lt;tt&gt;src/out/Debug/chrome&lt;/tt&gt;&lt;/ol&gt;
 Now you should be able to run chrome with no problem.&lt;/p&gt;&lt;/li&gt;
@@ -1396,29 +1365,33 @@ Now you should be able to run chrome with no problem.&lt;/p&gt;&lt;/li&gt;
 &lt;p&gt;To install flip-server, take a look at &lt;a title=&#34;Flip server installation&#34; href=&#34;http://www.chromium.org/spdy/running_flipinmemserver&#34; target=&#34;_blank&#34;&gt;this&lt;/a&gt;. Go to the Chromuim &lt;tt&gt;src&lt;/tt&gt; directory, and here are the steps that I took to install flip server:&lt;/p&gt;
 
 &lt;ol&gt;
-&lt;li&gt;&lt;p&gt;If you don&amp;#8217;t already have a test key.pem and certificate.pem, you can generate one like so: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;openssl genrsa -out key.pem 1024
-openssl req -new -key key.pem -out request.pem  #and answer the questions at the prompt with whatever
-openssl x509 -req -days 30 -in request.pem -signkey key.pem -out cert.pem&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;If you don&amp;#8217;t already have a test key.pem and certificate.pem, you can generate one like so:&lt;/p&gt;
 
-&lt;li&gt;&lt;p&gt;Get the patch from: &lt;a href=&#34;http://codereview.chromium.org/1566013&#34;&gt;http://codereview.chromium.org/1566013&lt;/a&gt;, Click the &amp;#8216;download raw patch&amp;#8217; link and save. Assuming you&amp;#8217;re in the &lt;tt&gt;chromium/src&lt;/tt&gt; directory, type: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;patch -p0 &amp;lt; filename_of_the_patch_you_just_downloaded&lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;pre&gt;&lt;code&gt;openssl genrsa -out key.pem 1024
+openssl req -new -key key.pem -out request.pem  #and answer the questions at the prompt with whatever
+openssl x509 -req -days 30 -in request.pem -signkey key.pem -out cert.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;/li&gt;
+
+&lt;li&gt;&lt;p&gt;Get the patch from: &lt;a href=&#34;http://codereview.chromium.org/1566013&#34;&gt;http://codereview.chromium.org/1566013&lt;/a&gt;, Click the &amp;#8216;download raw patch&amp;#8217; link and save. Assuming you&amp;#8217;re in the &lt;tt&gt;chromium/src&lt;/tt&gt; directory, type: &lt;code&gt;patch -p0 &amp;lt; filename_of_the_patch_you_just_downloaded&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;Find the commented-out-section in net.gyp (look for &amp;#8216;flip_in_mem_edsm_server&amp;#8221;) and uncomment it.&lt;/p&gt;&lt;/li&gt;
 
-&lt;li&gt;&lt;p&gt;You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you&amp;#8217;ve done all that, you do: &lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;make out/Debug/flip_in_mem_edsm_server &lt;/pre&gt;&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you&amp;#8217;ve done all that, you do: &lt;code&gt;make out/Debug/flip_in_mem_edsm_server&lt;/code&gt;&lt;/p&gt;&lt;/li&gt;
 
 &lt;li&gt;&lt;p&gt;I had to change these lines to get rid of some compiling errors :&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;&lt;p&gt;While compiling I got :&lt;br /&gt;
-&amp;gt; &lt;pre class=&#34;brush: plain; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/usr/include/linux/tcp.h:72: error: &amp;lsquo;__u32 &lt;strong&gt;fswab32(&lt;/strong&gt;u32)&amp;rsquo; cannot
+&lt;li&gt;&lt;p&gt;While compiling I got :&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;/usr/include/linux/tcp.h:72: error: &#39;__u32 __fswab32(__u32)&#39; cannot
 appear in a constant-expression
 /usr/include/linux/tcp.h:72: error: a function call cannot appear in a
 constant-expression
-/usr/include/linux/tcp.h:73: error: &amp;lsquo;__u32 &lt;strong&gt;fswab32(&lt;/strong&gt;u32)&amp;rsquo; cannot
+/usr/include/linux/tcp.h:73: error: &#39;__u32 __fswab32(__u32)&#39; cannot
 appear in a constant-expression
 /usr/include/linux/tcp.h:73: error: a function call cannot appear in a
 constant-expression
-&lt;/pre&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;To fix it, in file &lt;tt&gt;src/net/tools/flip_server/flip_in_mem_edsm_server.cc&lt;/tt&gt; change the line that reads:&lt;/p&gt;
 
@@ -1440,87 +1413,84 @@ constant-expression
 
 &lt;h2 id=&#34;install-chrome-which-is-able-to-talk-to-localhost-server:9b6dd0bb85defcc32bbe025166e81019&#34;&gt;Install Chrome which is able to talk to localhost server&lt;/h2&gt;
 
-&lt;p&gt;Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run &lt;tt&gt;bash filename&lt;/tt&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;pre class=&#34;brush: bash; collapse: true; light: false; title: ; toolbar: true; notranslate&#34; title=&#34;&#34;&gt;#!/bin/bash&lt;/p&gt;&lt;/li&gt;
+&lt;p&gt;Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run &lt;tt&gt;bash filename&lt;/tt&gt;:&lt;/p&gt;&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;if [ &amp;ldquo;$(dpkg &amp;ndash;print-architecture)&amp;rdquo; == &amp;ldquo;amd64&amp;rdquo; ]; then
-  echo -ne &amp;ldquo;\n\nYou have a 64 bit computer\n\n&amp;rdquo;
-  linux_versions=&amp;ldquo;linux64&amp;rdquo;;
+&lt;pre&gt;&lt;code&gt;#!/bin/bash
+
+if [ &amp;quot;$(dpkg --print-architecture)&amp;quot; == &amp;quot;amd64&amp;quot; ]; then
+  echo -ne &amp;quot;\n\nYou have a 64 bit computer\n\n&amp;quot;
+  linux_versions=&amp;quot;linux64&amp;quot;;
 else
-  echo -ne &amp;ldquo;\n\nYou have a 32 bit computer\n\n&amp;rdquo;
-  linux_versions=&amp;ldquo;linux&amp;rdquo;;
-fi&lt;/p&gt;
+  echo -ne &amp;quot;\n\nYou have a 32 bit computer\n\n&amp;quot;
+  linux_versions=&amp;quot;linux&amp;quot;;
+fi
 
-&lt;p&gt;for linux_version in $linux_versions; do
-  install_dir=$HOME/spdy-chrome-canary/$linux_version&lt;/p&gt;
+for linux_version in $linux_versions; do
+  install_dir=$HOME/spdy-chrome-canary/$linux_version
 
-&lt;p&gt;if mkdir -p $install_dir; then
-    echo &amp;ldquo;Directory: \&amp;ldquo;$install_dir\&amp;rdquo; made or already existed&amp;rdquo;
+  if mkdir -p $install_dir; then
+    echo &amp;quot;Directory: \&amp;quot;$install_dir\&amp;quot; made or already existed&amp;quot;
   else
-      echo &amp;ldquo;$install_dir exists, but is not a directory.&amp;rdquo;
-      echo &amp;ldquo;Please remove whatever is there so this script can proceed next time.&amp;rdquo;
+      echo &amp;quot;$install_dir exists, but is not a directory.&amp;quot;
+      echo &amp;quot;Please remove whatever is there so this script can proceed next time.&amp;quot;
       exit 128
-  fi&lt;/p&gt;
+  fi
 
-&lt;p&gt;pushd $install_dir&lt;/p&gt;
+  pushd $install_dir
 
-&lt;p&gt;install -d chrome-linux-old
-  mv chrome-linux chrome-linux-old/chrome-linux-&lt;code&gt;date +&amp;quot;%F-%k-%M-%S-%N&amp;quot;&lt;/code&gt;
+  install -d chrome-linux-old
+  mv chrome-linux chrome-linux-old/chrome-linux-`date +&amp;quot;%F-%k-%M-%S-%N&amp;quot;`
   rm -rf chrome-linux chrome-linux-old chrome-linux.zip
-  wget &lt;a href=&#34;http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip&#34;&gt;http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip&lt;/a&gt;
+  wget http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip
   unzip chrome-linux.zip
-  rm -rf chrome-linux.zip&lt;/p&gt;
+  rm -rf chrome-linux.zip
 
-&lt;p&gt;popd&lt;/p&gt;
+  popd
 
-&lt;p&gt;filename_base=SPDY-Chrome-$linux_version
-  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+  filename_base=SPDY-Chrome-$linux_version
+  cat &amp;amp;gt;&amp;amp;gt; $HOME/Desktop/$filename_base.desktop &amp;amp;lt;&amp;amp;lt;-EOF
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
 Name=$filename_base
 Categories=Application;Network;WebBrowser;
-Exec=$install_dir/chrome-linux/chrome &amp;ndash;use-spdy &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base %U
+Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base %U
 Icon=/tmp/chrome-linux/product_logo_48.png
 MimeType=text/html;text/xml;
 Terminal=false
 Type=Application
-EOF&lt;/p&gt;
+EOF
 
-&lt;p&gt;filename_base=SPDY-Chrome-local-server-$linux_version
-  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+  filename_base=SPDY-Chrome-local-server-$linux_version
+  cat &amp;amp;gt;&amp;amp;gt; $HOME/Desktop/$filename_base.desktop &amp;amp;lt;&amp;amp;lt;-EOF
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
 Name=$filename_base
 Categories=Application;Network;WebBrowser;
-Exec=$install_dir/chrome-linux/chrome &amp;ndash;use-spdy &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base &amp;ndash;host-resolver-rules=&amp;lsquo;MAP * localhost&amp;rsquo; &amp;ndash;testing-fixed-http-port=10040 &amp;ndash;testing-fixed-https-port=10040 %U
+Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules=&#39;MAP * localhost&#39; --testing-fixed-http-port=10040 --testing-fixed-https-port=10040 %U
 Icon=/tmp/chrome-linux/product_logo_48.png
 MimeType=text/html;text/xml;
 Terminal=false
 Type=Application
-EOF&lt;/p&gt;
+EOF
 
-&lt;p&gt;filename_base=NO-SPDY-Chrome-local-server-$linux_version
-  cat &amp;gt;&amp;gt; $HOME/Desktop/$filename_base.desktop &amp;lt;&amp;lt;-EOF
+  filename_base=NO-SPDY-Chrome-local-server-$linux_version
+  cat &amp;amp;gt;&amp;amp;gt; $HOME/Desktop/$filename_base.desktop &amp;amp;lt;&amp;amp;lt;-EOF
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
 Name=$filename_base
 Categories=Application;Network;WebBrowser;
-Exec=$install_dir/chrome-linux/chrome &amp;ndash;enable-logging &amp;ndash;log-level=0 &amp;ndash;user-data-dir=.$filename_base &amp;ndash;host-resolver-rules=&amp;lsquo;MAP * localhost&amp;rsquo; &amp;ndash;testing-fixed-http-port=16002 &amp;ndash;testing-fixed-https-port=16002 %U
+Exec=$install_dir/chrome-linux/chrome --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules=&#39;MAP * localhost&#39; --testing-fixed-http-port=16002 --testing-fixed-https-port=16002 %U
 Icon=/tmp/chrome-linux/product_logo_48.png
 MimeType=text/html;text/xml;
 Terminal=false
 Type=Application
-EOF&lt;/p&gt;
+EOF
 
-&lt;p&gt;done
-&lt;/pre&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;&amp;lt;span class=&#39;st\_facebook&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_email&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_fblike&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_plusone&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;SPDY installation&#39; st_url=&#39;http://www.samanbarghi.com/2010/03/31/spdy-installation/&#39;&amp;gt;&amp;lt;/span&amp;gt;
+done
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>

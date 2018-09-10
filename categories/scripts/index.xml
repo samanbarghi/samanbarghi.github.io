@@ -17,7 +17,21 @@
       <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
       <description>
 
-&lt;p&gt;[&lt;img class=&#34;wp-image-252 alignleft&#34; title=&#34;National Geographic Photo Of the Day&#34; src=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721-300x225.jpg&#34; alt=&#34;National Geographic Photo Of the Day&#34; width=&#34;300&#34; height=&#34;225&#34; /&gt;][1] I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://samanbarghi.com/images/ngh-photo.jpg&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;National Geographic&amp;#39;s Photo Of the Day&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+
+&lt;p&gt;I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
 
 &lt;blockquote&gt;
 &lt;p&gt;&lt;a title=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; target=&#34;_blank&#34;&gt;&lt;a href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34;&gt;https://github.com/samanbarghi/ngphotodownloader&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
@@ -46,8 +60,6 @@ git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Enjoy! &lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;[1]: &lt;a href=&#34;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&#34;&gt;http://www.samanbarghi.com/wp-content/uploads/2012/08/57275_1600x1200-wallpaper-cb1343743721.jpg&lt;/a&gt;&lt;/p&gt;
 </description>
     </item>
     
