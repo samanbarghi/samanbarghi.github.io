@@ -1,2 +1,54 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>FreeBsd on Saman Barghi</title><link>http://samanbarghi.com/categories/freebsd/</link><description>Recent content in FreeBsd on Saman Barghi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 04 Feb 2011 00:00:00 +0000</lastBuildDate><atom:link href="http://samanbarghi.com/categories/freebsd/index.xml" rel="self" type="application/rss+xml"/><item><title>SSH to VirtualBox 3 FreeBsd Guests</title><link>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/</link><pubDate>Fri, 04 Feb 2011 00:00:00 +0000</pubDate><guid>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests/</guid><description>This post is based on “Howto: SSH into VirtualBox 3 Linux Guests”by Stuart Colville, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.
-Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Freebsd on Saman Barghi</title>
+    <link>http://samanbarghi.com/categories/freebsd/</link>
+    <description>Recent content in Freebsd on Saman Barghi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 04 Feb 2011 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://samanbarghi.com/categories/freebsd/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>SSH to VirtualBox 3 FreeBsd Guests</title>
+      <link>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</link>
+      <pubDate>Fri, 04 Feb 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2011/02/04/ssh-to-virtualbox-3-freebsd-guests</guid>
+      <description>&lt;p&gt;This post is based on &lt;a href=&#34;http://muffinresearch.co.uk/archives/2010/02/08/howto-ssh-into-virtualbox-3-linux-guests/&#34; target=&#34;_blank&#34;&gt;&amp;#8220;Howto: SSH into VirtualBox 3 Linux Guests&amp;#8221;&lt;/a&gt; by &lt;a href=&#34;http://muffinresearch.co.uk/&#34; target=&#34;_blank&#34;&gt;Stuart Colville&lt;/a&gt;, which I have updated to work for FreeBSD Guests: In older versions of VirtualBox one had to use a bridge interface to make this work. However, in newer versions; a virtual interface can be added to the Host by default, which make it way easier to access the guest machine through the host.&lt;/p&gt;
+
+&lt;p&gt;Usually, you have a primary network interface which uses NAT adapter, that one is needed for connecting to the Internet. What we are going to do is to add an additional interface to the guest machine. All you have to do is to access the settings of the guest when it is off.  Select Network-&amp;gt;Adapter 2, then check the &amp;#8220;Enable Network Adapter&amp;#8221; as shown below. Change &amp;#8220;attached to&amp;#8221; to &amp;#8220;Host-only Adapter&amp;#8221; this will have the name vboxnet0 by default.&lt;/p&gt;
+
+&lt;p&gt;Now if you do &lt;em&gt;ifconfing&lt;/em&gt; on your host machine (On Windows hosts use &lt;em&gt;ipconfig&lt;/em&gt;), there will be a new interface called *vboxnet0 *(same as the virtual adapter name you just added). You will notice the IP address is something similar to this:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;inet addr:192.168.56.1  Bcast:192.168.56.255  Mask:255.255.255.0&lt;/pre&gt;
+
+&lt;p&gt;Which means his interface can access all the IP addresses in the following range: &lt;em&gt;192.168.56.1-192.168.56.254&lt;/em&gt;. This is needed to setup the guest interface properly.&lt;/p&gt;
+
+&lt;p&gt;Now, boot the FreeBsd guest. If you do *ifconfig &lt;em&gt;on your guest machine&lt;/em&gt;, *You will notice that a second interface has been added to your machine (The name is *em1 *if you already had one interface). You have to configure the new interface; so you can access it by your host machine. We will set a static IP address for this interface using the IP range above.&lt;/p&gt;
+
+&lt;p&gt;Next add the following lines to &lt;em&gt;&amp;#8220;/etc/rc.conf&amp;#8221;&lt;/em&gt; in your guest machine:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;ifconfig_em1=&#34;inet 192.168.56.10 netmask 255.255.255.0&#34;
+&lt;/pre&gt;
+
+&lt;p&gt;Save this and run the following command to restart the network interfaces:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/etc/rc.d/netif restart &lt;/pre&gt;
+
+&lt;p&gt;If you have not enabled SSH on your FreeBsd guest yet, edit &lt;em&gt;/etc/rc.conf&lt;/em&gt; and add the following:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; title: ; notranslate&#34; title=&#34;&#34;&gt;sshd_enable=&#34;YES&#34; &lt;/pre&gt;
+
+&lt;p&gt;and then run:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;/etc/rc.d/sshd start &lt;/pre&gt;
+
+&lt;p&gt;That&amp;#8217;s it, now you should be able to ssh to your guest machine by:&lt;/p&gt;
+
+&lt;pre class=&#34;brush: bash; light: true; title: ; notranslate&#34; title=&#34;&#34;&gt;ssh saman@192.168.56.10 &lt;/pre&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

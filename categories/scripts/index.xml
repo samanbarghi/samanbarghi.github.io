@@ -1,1 +1,67 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Scripts on Saman Barghi</title><link>http://samanbarghi.com/categories/scripts/</link><description>Recent content in Scripts on Saman Barghi</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 29 Aug 2012 00:00:00 +0000</lastBuildDate><atom:link href="http://samanbarghi.com/categories/scripts/index.xml" rel="self" type="application/rss+xml"/><item><title>National Geographic Photo of the day Downloader for Linux</title><link>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux/</link><pubDate>Wed, 29 Aug 2012 00:00:00 +0000</pubDate><guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux/</guid><description>National Geographic&amp;#39;s Photo Of the Day I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it’s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well.</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Scripts on Saman Barghi</title>
+    <link>http://samanbarghi.com/categories/scripts/</link>
+    <description>Recent content in Scripts on Saman Barghi</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 29 Aug 2012 00:00:00 +0000</lastBuildDate>
+    <atom:link href="http://samanbarghi.com/categories/scripts/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>National Geographic Photo of the day Downloader for Linux</title>
+      <link>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</link>
+      <pubDate>Wed, 29 Aug 2012 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2012/08/29/national-geographic-photo-of-the-day-downloader-for-linux</guid>
+      <description>
+
+
+&lt;figure &gt;
+    
+        &lt;img src=&#34;http://samanbarghi.com/images/ngh-photo.jpg&#34; /&gt;
+    
+    
+    &lt;figcaption&gt;
+        &lt;h4&gt;National Geographic&amp;#39;s Photo Of the Day&lt;/h4&gt;
+        
+    &lt;/figcaption&gt;
+    
+&lt;/figure&gt;
+
+
+&lt;p&gt;I am a fan of National Geographic photos on their site, and I also get bored of by my desktop background after a while. So I decided to create a script to download National Geographic photo of the day, and using it as my desktop background. I am using it over Gnome3 (I am using Fedora as I think it&amp;#8217;s more stable than Ubuntu, and I like Gnome3 way better than Unity), but if you are a Unity user it should work for you as well. You can find the script here:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;&lt;a title=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34; target=&#34;_blank&#34;&gt;&lt;a href=&#34;https://github.com/samanbarghi/ngphotodownloader&#34;&gt;https://github.com/samanbarghi/ngphotodownloader&lt;/a&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Although National Geographic posts a photo everyday, not all the photos come with a high quality format. So the script checks whether a wallpaper format exists or not. If so, it downloads the photo into the same directory the script resides.&lt;/p&gt;
+
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+
+&lt;h2 id=&#34;setup:2322363d5b3491b8421298be27f8697e&#34;&gt;Setup&lt;/h2&gt;
+
+&lt;p&gt;All you need to do is  create a directory for your wallpaper and put the script in there, e.g.:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;cd ~/Pictures/
+git clone https://github.com/samanbarghi/ngphotodownloader.git NGWallpapers
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Simply run the script to get the Photo of the day. But doing that manually everyday is not fun. Here cron comes handy. You need to run the script at least once each day, to automate the process you can use cron to download the script and set it as your desktop background:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;0 12 * * * sh /home/yourusername/Pictures/NGWallpapers/ngwallpaper.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In my case since I am running the script on my laptop, and my laptop is not always on; I call the script every 3 hours to make sure it runs at least once each day. Don&amp;#8217;t worry about duplicates, the script will not download the image if it already exists in the directory. The overhead of the script on cpu/memory/network is negligible, so don&amp;#8217;t worry about calling the script 8 times a day:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;00 */3 * * * sh /home/yourusername/Pictures/NGWallpapers/ngwallpaper.sh
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Enjoy! &lt;br /&gt;&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
