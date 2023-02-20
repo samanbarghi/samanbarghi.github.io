@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>hack on Saman Barghi</title>
+    <link>http://samanbarghi.com/tags/hack/</link>
+    <description>Recent content in hack on Saman Barghi</description>
+    <image>
+      <url>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 11 Jan 2011 00:00:00 +0000</lastBuildDate><atom:link href="http://samanbarghi.com/tags/hack/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Some Notes on Facebook Hacker Cup Qualification Round</title>
+      <link>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/2011/01/11/some-notes-on-facebook-hacker-cup-qualification-round/</guid>
+      <description>Monday, January 10 was the last day to submit your answers to get qualified for Facebook Hacker Cup. It started from January 7, and lasted for 3 days. There were three problems presented on the competition website, to be solved by participants. Problems were provided with sample input and output, and there were no time limits to browse through the problems and to develop your code. To answer each problem, competitors had to download an input and submit their output, yet they only had 6 minutes, after they downloaded the input, to submit their answers through the form provided.</description>
+    </item>
+    
+  </channel>
+</rss>

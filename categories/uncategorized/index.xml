@@ -1,155 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Uncategorized on Saman Barghi</title>
     <link>http://samanbarghi.com/categories/uncategorized/</link>
     <description>Recent content in Uncategorized on Saman Barghi</description>
+    <image>
+      <url>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 26 Aug 2011 00:00:00 +0000</lastBuildDate>
-    <atom:link href="http://samanbarghi.com/categories/uncategorized/index.xml" rel="self" type="application/rss+xml" />
-    
+    <lastBuildDate>Fri, 26 Aug 2011 00:00:00 +0000</lastBuildDate><atom:link href="http://samanbarghi.com/categories/uncategorized/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Mercurial on Bluehost</title>
-      <link>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</link>
+      <link>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost/</link>
       <pubDate>Fri, 26 Aug 2011 00:00:00 +0000</pubDate>
       
-      <guid>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost</guid>
-      <description>&lt;p style=&#34;text-align: left;&#34;&gt;
-  I had to install a mercurial repository on bluehost for one of my projects. The good thing about mercurial is that it allows you to access your repository through http, and it is an ideal version control system for shared hosts. I googled around for it, and I found a couple of instructions available (&lt;a href=&#34;http://bugtracker.gttools.com/public/wiki/bluehost/Mercurial&#34;&gt;this&lt;/a&gt; and &lt;a href=&#34;http://gttools.com/bluehost-setup/mercurial-and-trac-setup-on-bluehost&#34;&gt;this&lt;/a&gt;). But they are outdated, and probably worked with earlier versions of mercurial. So I decided to rewrite the instruction of installing mercurial on your shared host (specifically bluehost):
-&lt;/p&gt;
-
-&lt;p style=&#34;text-align: left;&#34;&gt;
-  &amp;nbsp;
-&lt;/p&gt;
-
-&lt;p style=&#34;text-align: left;&#34;&gt;
-  &lt;span style=&#34;text-align: -webkit-auto;&#34;&gt;Update your bash profile, add/modify these 3 lines:&lt;/span&gt;
-&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;vim ~/.bash_profile
-export LD_LIBRARY_PATH=”$HOME/packages/lib:$LD_LIBRARY_PATH”
-export PYTHONPATH=”$HOME/packages/lib/python2.3/site-packages:$PYTHONPATH”
-export PATH=”$HOME/packages/bin:$HOME/bin:$PATH”
-source ~/.bash_profile
-vim ~/.bashrc
-PATH=$PATH:$HOME/bin:$HOME/packages/mercurial
-source ~/.bashrc
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Create folders (Please note, from now on my assumption is that your web directory is located at $HOME/public_html, please change the related parts if your configuration is different):&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd
-mkdir install_files
-mkdir packages
-mkdir ~/public_html/hg
-mkdir ~/public_html/hg/repos
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Get Mercurial and install:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd ~/packages
-wget http://selenic.com/repo/hg-stable/archive/tip.tar.gz
-tar zxf tip.tar.gz
-mv tip.tar.gz ~/install_files/
-mv Mercurial* mercurial
-cd mercurial
-#dont&#39; forget to change the username
-echo -e &amp;quot;[ui]\nusername=YOURUSERNAME &amp;amp;lt;YOUREMAIL@WEB.com&amp;amp;gt;&amp;quot; &amp;amp;gt; ~/.hgrc﻿
-make local
-./hg debuginstall
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Running the last command should not show any problems and you would see :&lt;span style=&#34;font-family: Consolas, Monaco, &#39;Courier New&#39;, Courier, monospace; font-size: 12px; line-height: 18px; white-space: pre;&#34;&gt; &lt;/span&gt;&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;Checking encoding (UTF-8)...
-Checking installed modules (~/packages/mercurial/mercurial)...
-Checking templates...
-Checking commit editor...
-Checking username...
-No problems detected
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In order to be able to push, mercurial provides a cgi script(hgweb.cgi) to handle push commands (&lt;a href=&#34;http://mercurial.selenic.com/wiki/PublishingRepositories#hgweb&#34;&gt;http://mercurial.selenic.com/wiki/PublishingRepositories#hgweb&lt;/a&gt;). In addition, there is a need for apache authentication module to perform the authentication tasks and manage accesses to our repository. Before, we can use the repository we need to copy the hgweb.cgi script to our web directory, and customize it afterwards:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;sed &#39;s|#import sys|import sys|g;s|/path/to/python/lib|&#39;$HOME&#39;/packages/mercurial|g;s|/path/to/repo/or/config|&#39;$HOME&#39;/public_html/hg/hgweb.config|g&#39; ~/packages/mercurial/hgweb.cgi &amp;amp;gt; $HOME/public_html/hg/hgweb.cgi
-chmod 755 ~/public_html/hg/hgweb.cgi
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Create hgweb.config file. You can use *[collections] *instead of &lt;em&gt;[paths]&lt;/em&gt; here, it depends on your personal taste. [Here][1] suggested to use paths instead of collection. So if you prefer to use &lt;em&gt;[collections]&lt;/em&gt; instead, do not forget to remove all the lines related to hgweb.config when you initialize your repository:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;echo [web] &amp;amp;gt; ~/public_html/hg/hgweb.config
-echo allowpull=true &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
-echo [paths] &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Create .htaccess file:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;echo &#39;Options +ExecCGI&#39; &amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteEngine On&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteBase /hg&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteRule ^$ hgweb.cgi [L]&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteCond %{REQUEST_FILENAME} !-f&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteCond %{REQUEST_FILENAME} !-d&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;RewriteRule (.*) hgweb.cgi/$1 [QSA,L]&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;AuthUserFile /home/&#39;$USER&#39;/etc/hg-basic-auth&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;AuthName &amp;quot;HG Repositories&amp;quot;&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;AuthType Basic&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-echo &#39;Require valid-user&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/.htaccess
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Create Passwd files:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd
-htpasswd -b -c -d ~/etc/hg-basic-auth HgUserName PASSWORD
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For extra users:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;htpasswd -b -d ~/etc/hg-basic-auth HgUserNameExtra PASSWORD
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Initialize repositories (Do not forget to change all instances of PROJECT to your own project name):&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;cd ~/public_html/hg/repos
-~/packages/mercurial/hg init PROJECT
-echo &#39;PROJECT = &#39;$HOME&#39;/public_html/hg/repos/PROJECT&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;For extra projects :&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;~/packages/mercurial/hg init ExtraPROJECT
-echo &#39;ExtraPROJECT  = &#39;$HOME&#39;/public_html/hg/repos/ExtraPROJECT&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/hgweb.config
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now lets create hgrc files for each project :&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;echo &#39;[web]&#39; &amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
-echo &#39;contact=admin email address&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
-echo &#39;description=My releases&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
-echo &#39;allow_push=USER1, USERn&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
-echo &#39;allow_archive=zip&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hg/hgrc
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;By default, pushing is only allowed via HTTPS. To permit HTTP pushing you have to add this to your repository&amp;#8217;s &lt;tt&gt;.hg/hgrc&lt;/tt&gt; file (or your Web server user&amp;#8217;s &lt;tt&gt;.hgrc&lt;/tt&gt; file, such as&lt;tt&gt;/home/www-data/.hgrc&lt;/tt&gt;, or a system-wide &lt;tt&gt;hgrc&lt;/tt&gt; file like &lt;tt&gt;/etc/mercurial/hgrc&lt;/tt&gt;):&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I personally decided to put this in the hgrc file in my repository:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;echo &#39;push_ssl = false&#39; &amp;amp;gt;&amp;amp;gt; ~/public_html/hg/repos/PROJECT/.hgrc
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You are basically done. You can access your repository using :&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;hg clone http://yourdomain.com/hg/PROJECT
-
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;span class=&#39;st\_facebook&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span st\_via=&#39;saman\_b&#39; class=&#39;st\_twitter&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_email&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_sharethis&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_fblike&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_plusone&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;span class=&#39;st\_pinterest&#39; st\_title=&#39;Mercurial on Bluehost&#39; st_url=&#39;http://www.samanbarghi.com/2011/08/26/mercurial-on-bluehost/&#39;&gt;&lt;/span&gt;&lt;/p&gt;
-
-&lt;p&gt;[1]: &lt;a href=&#34;http://mercurial.selenic.com/wiki/PublishingRepositories#Configuration_of_hgweb&#34;&gt;http://mercurial.selenic.com/wiki/PublishingRepositories#Configuration_of_hgweb&lt;/a&gt;&lt;/p&gt;
-</description>
+      <guid>http://samanbarghi.com/2011/08/26/mercurial-on-bluehost/</guid>
+      <description>&lt;!-- raw HTML omitted --&gt;
+&lt;!-- raw HTML omitted --&gt;
+&lt;!-- raw HTML omitted --&gt;</description>
     </item>
     
   </channel>

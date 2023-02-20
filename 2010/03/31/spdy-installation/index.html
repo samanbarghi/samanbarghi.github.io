@@ -1,240 +1,68 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
-<head>
-  <link href="http://gmpg.org/xfn/11" rel="profile">
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
-
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-
-  <title>SPDY installation &middot; Saman Barghi</title>
-
-  
-  <link rel="stylesheet" href="http://samanbarghi.com/css/poole.css">
-  <link rel="stylesheet" href="http://samanbarghi.com/css/hyde.css">
-  <link rel="stylesheet" href="http://samanbarghi.com/css/poole-overrides.css">
-  <link rel="stylesheet" href="http://samanbarghi.com/css/hyde-overrides.css">
-  <link rel="stylesheet" href="http://samanbarghi.com/css/hyde-x.css">
-  <link rel="stylesheet" href="http://samanbarghi.com/css/highlight/monokai_sublime.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
-  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-  
-
-  
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://samanbarghi.com/touch-icon-144-precomposed.png">
-  <link href="http://samanbarghi.com/favicon.png" rel="icon">
-
-  
-  
-  
-  
-
-  <meta name="description" content="Your default page description">
-  <meta name="keywords" content="Saman,Barghi,Personal,Blog,Programming,Developer,University of Waterloo, hacker">
-  
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-    ga('create', 'UA-48282777-1', 'auto');
-    ga('send', 'pageview');
-  </script>
-  
-</head>
-<body class="theme-base-0c">
-<div class="sidebar">
-  <div class="container sidebar-sticky">
-    <div class="sidebar-about">
-      
-        <img src="https://www.gravatar.com/avatar/c46fe343ef662d682b4dc15cfe78cb06?s=200"
-             alt="gravatar" title="Saman Barghi">
-      
-      <h1>Saman Barghi</h1>
-      <p class="lead">Opinions expressed are solely my own and do not express the views or opinions of my employer</p>
-    </div>
-
-    <ul class="sidebar-nav">
-      <li class="sidebar-nav-item"><a href="http://samanbarghi.com/">Blog</a></li>
-      
-      <li class="sidebar-nav-item"><a href="http://samanbarghi.com/about/">About</a></li>
-      
-      <li class="sidebar-nav-item"><a href="http://samanbarghi.com/projects/">Projects</a></li>
-      
-    </ul>
-
-    <ul class="sidebar-nav">
-      <li class="sidebar-nav-item">
-      <a href="https://github.com/samanbarghi"><i class="fa fa-github-square fa-3x"></i></a>
-      
-      <a href="http://stackexchange.com/users/308492/saman-barghi"><i class="fa fa-stack-overflow fa-3x"></i></a>
-      <a href="https://ca.linkedin.com/in/samanbarghi"><i class="fa fa-linkedin-square fa-3x"></i></a>
-      <a href="https://plus.google.com/107308907271825277073"><i class="fa fa-google-plus-square fa-3x"></i></a>
-      
-      
-      
-      <a href="http://samanbarghi.com/index.xml" type="application/rss+xml"><i class="fa fa-rss-square fa-3x"></i></a>
-      </li>
-    </ul>
-
-    
-    <p><script id='flattr'>
-      (function(id){
-        var s = document.getElementById(id);
-        var f = document.createElement('iframe');
-        f.src = '//api.flattr.com/button/view/?uid=&button=compact&url=http:\/\/samanbarghi.com\/&title=Saman Barghi';
-        f.title = 'Flattr';
-        f.height = 20;
-        f.width = 110;
-        f.style.borderWidth = 0;
-        s.parentNode.insertBefore(f, s);
-      })('flattr');
-    </script></p>
-    
-
-    
-  </div>
-</div>
-
-
-<div class="content container">
-  <div class="post">
-    <h1 class="post-title">SPDY installation</h1>
-    <span class="post-date">Mar 31, 2010 &middot; 5 minute read &middot; <a href="http://samanbarghi.com/2010/03/31/spdy-installation#disqus_thread">Comments</a>
-    
-    <br/>
-    <a class="label" href="http://samanbarghi.com/categories/guides">Guides</a>
-    </span>
-    
-
-<p>I am taking a course called &#8220;Latency in Communication Systems&#8221; taught by <a href="http://www.cs.uwaterloo.ca/~mkarsten/" target="_blank">Martin Karsten</a> in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate <a title="SPDY" href="http://www.chromium.org/spdy" target="_blank"><strong>SPDY</strong></a>. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it&#8217;s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.</p>
-
-<h2 id="install-chromium:9b6dd0bb85defcc32bbe025166e81019">Install Chromium</h2>
-
-<p>Edit: Follow the build instruction for linux here: <a href="http://code.google.com/p/chromium/wiki/LinuxBuildInstructions">http://code.google.com/p/chromium/wiki/LinuxBuildInstructions</a></p>
-
-<p>I started to compile chromium on Ubuntu Karmic Koala 9.10. The obvious place to start is the <a title="Chromium" href="http://dev.chromium.org/" target="_blank">chromium website</a>, Although take a look at <a title="Cache data for SPDY server" href="http://groups.google.com/group/spdy-dev/browse_thread/thread/16e0a9d5592ca908" target="_blank">this</a>, we need to enable data recording to cache some data for the in-memory server, I will explain this later. These are the required step to take :</p>
-
-<ol>
-<li>Install all the <a title="Chromium Ubuntu prerequisites" href="http://code.google.com/p/chromium/wiki/LinuxBuildInstructionsPrerequisites#Ubuntu_Setup" target="_blank">prerequisites</a></li>
-<li>Download the source tarball from <a title="Chromium Source tarball" href="http://build.chromium.org/buildbot/archives/chromium_tarball.html" target="_blank">here</a>.</li>
-<li>Extract it to a location (It should not include any spaces). I extracted it to <tt>~/chromium</tt></li>
-
-<li><p>Install depot_tools</p>
-
-<ol>
-<li><p><code>svn co http://src.chromium.org/svn/trunk/tools/depot_tools</code></p></li>
-
-<li><p>Add depot_tools to your PATH:
-<code>$ export PATH=`pwd`/depot_tools:&quot;$PATH&quot;</code></p></li>
-</ol></li>
-
-<li><p>Updating your checkout once by running <code>gclient sync --force</code></p>
-
-<p><span style="font-family: arial,sans-serif;"> in the source code directory (~/chromium/src). It is important to include the &#8216;&#8211;force&#8217; option as I was getting this message: </span></p>
-
-<p><code>make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py', needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c'. Stop.&quot;</code></p>
-
-<p><span style="font-family: arial,sans-serif;">over and over again since I forgot to include the <tt>&ndash;force</tt> option. It seems that this command generate platform-specific files</span></li></p>
-
-<ul>
-<li><p><strong>Important:</strong> ensure that you have <tt>GYP_GENERATORS=make</tt> in your environment before running <tt>gclient sync</tt> or <tt>gclient runhooks &ndash;force</tt>. This tells the Chromium build system to output Makefiles. Example: <code>export GYP_GENERATORS=make
-gclient sync</code></p></li>
-
-<li><p>Take this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file <tt>chrome/common/chrome_constants.cc </tt>- change the line which reads <code>kRecordModeEnabled = false</code></p>
-
-<p>to</p>
-
-<p><code>kRecordModeEnabled = true</code></p></li>
-
-<li><p>Go to the source directory and write (if you are using a multiple-core machine use <tt>-jX</tt>, where <tt>X</tt> is the number of make processes to startup): <code>make chrome</code></p></li>
-
-<li><p>You can find the executable in <tt>src/out/Debug/chrome</tt></ol>
-Now you should be able to run chrome with no problem.</p></li>
-</ul>
-
-<h2 id="install-flip-server:9b6dd0bb85defcc32bbe025166e81019">Install flip-server</h2>
-
-<p>To install flip-server, take a look at <a title="Flip server installation" href="http://www.chromium.org/spdy/running_flipinmemserver" target="_blank">this</a>. Go to the Chromuim <tt>src</tt> directory, and here are the steps that I took to install flip server:</p>
-
-<ol>
-<li><p>If you don&#8217;t already have a test key.pem and certificate.pem, you can generate one like so:</p>
-
-<pre><code>openssl genrsa -out key.pem 1024
+<!doctype html><html lang=en dir=auto><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge"><meta name=viewport content="width=device-width,initial-scale=1,shrink-to-fit=no"><meta name=robots content="index, follow"><title>SPDY installation | Saman Barghi</title><meta name=keywords content><meta name=description content="I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY."><meta name=author content="Saman Barghi"><link rel=canonical href=http://samanbarghi.com/2010/03/31/spdy-installation/><link crossorigin=anonymous href=/assets/css/stylesheet.css rel="preload stylesheet" as=style><script defer crossorigin=anonymous src=/assets/js/highlight.js onload=hljs.initHighlightingOnLoad()></script>
+<link rel=icon href=http://samanbarghi.com/images/favicon/favicon.ico><link rel=icon type=image/png sizes=16x16 href=http://samanbarghi.com/images/favicon/favicon-16x16.png><link rel=icon type=image/png sizes=32x32 href=http://samanbarghi.com/images/favicon/favicon-32x32.png><link rel=apple-touch-icon href=http://samanbarghi.com/images/favicon/apple-touch-icon.png><link rel=mask-icon href=http://samanbarghi.com/images/favicon/safari-pinned-tab.svg><meta name=theme-color content="#2e2e33"><meta name=msapplication-TileColor content="#2e2e33"><noscript><style>#theme-toggle,.top-link{display:none}</style><style>@media(prefers-color-scheme:dark){:root{--theme:rgb(29, 30, 32);--entry:rgb(46, 46, 51);--primary:rgb(218, 218, 219);--secondary:rgb(155, 156, 157);--tertiary:rgb(65, 66, 68);--content:rgb(196, 196, 197);--hljs-bg:rgb(46, 46, 51);--code-bg:rgb(55, 56, 62);--border:rgb(51, 51, 51)}.list{background:var(--theme)}.list:not(.dark)::-webkit-scrollbar-track{background:0 0}.list:not(.dark)::-webkit-scrollbar-thumb{border-color:var(--theme)}}</style></noscript><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(e,t,n,s,o,i,a){e.GoogleAnalyticsObject=o,e[o]=e[o]||function(){(e[o].q=e[o].q||[]).push(arguments)},e[o].l=1*new Date,i=t.createElement(n),a=t.getElementsByTagName(n)[0],i.async=1,i.src=s,a.parentNode.insertBefore(i,a)}(window,document,"script","https://www.google-analytics.com/analytics.js","ga"),ga("create","UA-48282777-1","auto"),ga("send","pageview"))</script><meta property="og:title" content="SPDY installation"><meta property="og:description" content="I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY."><meta property="og:type" content="article"><meta property="og:url" content="http://samanbarghi.com/2010/03/31/spdy-installation/"><meta property="og:image" content="http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta property="article:section" content="post"><meta property="article:published_time" content="2010-03-31T00:00:00+00:00"><meta property="article:modified_time" content="2010-03-31T00:00:00+00:00"><meta property="og:site_name" content="Saman Barghi"><meta name=twitter:card content="summary_large_image"><meta name=twitter:image content="http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E"><meta name=twitter:title content="SPDY installation"><meta name=twitter:description content="I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY."><script type=application/ld+json>{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Posts","item":"http://samanbarghi.com/post/"},{"@type":"ListItem","position":2,"name":"SPDY installation","item":"http://samanbarghi.com/2010/03/31/spdy-installation/"}]}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"BlogPosting","headline":"SPDY installation","name":"SPDY installation","description":"I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY.","keywords":[],"articleBody":"I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it’s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.\nInstall Chromium Edit: Follow the build instruction for linux here: http://code.google.com/p/chromium/wiki/LinuxBuildInstructions\nI started to compile chromium on Ubuntu Karmic Koala 9.10. The obvious place to start is the chromium website, Although take a look at this, we need to enable data recording to cache some data for the in-memory server, I will explain this later. These are the required step to take :\nInstall all the prerequisites\nDownload the source tarball from here.\nExtract it to a location (It should not include any spaces). I extracted it to ~/chromium\nInstall depot_tools\nsvn co http://src.chromium.org/svn/trunk/tools/depot_tools\nAdd depot_tools to your PATH: $ export PATH=`pwd`/depot_tools:\"$PATH\" Updating your checkout once by running gclient sync --force in the source code directory (~/chromium/src). It is important to include the ‘–force’ option as I was getting this message: make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py', needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c'. Stop.\" over and over again since I forgot to include the –force option. It seems that this command generate platform-specific files\nImportant: ensure that you have GYP_GENERATORS=make in your environment before running gclient sync or gclient runhooks –force. This tells the Chromium build system to output Makefiles. Example: export GYP_GENERATORS=make gclient sync\nTake this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file chrome/common/chrome_constants.cc - change the line which reads kRecordModeEnabled = false\nto\nkRecordModeEnabled = true\nGo to the source directory and write (if you are using a multiple-core machine use -jX, where X is the number of make processes to startup): make chrome You can find the executable in src/out/Debug/chrome Now you should be able to run chrome with no problem.\nInstall flip-server To install flip-server, take a look at this. Go to the Chromuim src directory, and here are the steps that I took to install flip server:\nIf you don’t already have a test key.pem and certificate.pem, you can generate one like so: openssl genrsa -out key.pem 1024 openssl req -new -key key.pem -out request.pem #and answer the questions at the prompt with whatever openssl x509 -req -days 30 -in request.pem -signkey key.pem -out cert.pem 2. Get the patch from: , Click the \u0026#8216;download raw patch\u0026#8217; link and save. Assuming you\u0026#8217;re in the chromium/src directory, type: ``patch -p0 \u003c filename_of_the_patch_you_just_downloaded`` 3. Find the commented-out-section in net.gyp (look for \u0026#8216;flip\\_in\\_mem\\_edsm\\_server\u0026#8221;) and uncomment it. 4. You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you\u0026#8217;ve done all that, you do: ``make out/Debug/flip_in_mem_edsm_server `` 5. I had to change these lines to get rid of some compiling errors : * While compiling I got : /usr/include/linux/tcp.h:72: error: '__u32 __fswab32(__u32)' cannot appear in a constant-expression /usr/include/linux/tcp.h:72: error: a function call cannot appear in a constant-expression /usr/include/linux/tcp.h:73: error: '__u32 __fswab32(__u32)' cannot appear in a constant-expression /usr/include/linux/tcp.h:73: error: a function call cannot appear in a constant-expression To fix it, in file src/net/tools/flip_server/flip_in_mem_edsm_server.cc change the line that reads: #include \u0026lt;linux/tcp.h\u0026gt; to #include \u0026lt;netinet/tcp.h\u0026gt; * In the same file change : state-\u0026gt;ssl_method = SSLv23_method(); to state-\u0026gt;ssl_method = const_cast\u0026lt;SSL_METHOD *\u0026gt; (SSLv23_method()); * I was getting some errors related to printSslError function in flip_in_mem_edsm_server.cc, it seems that this function prints out the errors related to SSL encryption, since I did not need that I commented the contents of the function out. ## Install Chrome which is able to talk to localhost server Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run bash filename: #!/bin/bash if [ \"$(dpkg --print-architecture)\" == \"amd64\" ]; then echo -ne \"\\n\\nYou have a 64 bit computer\\n\\n\" linux_versions=\"linux64\"; else echo -ne \"\\n\\nYou have a 32 bit computer\\n\\n\" linux_versions=\"linux\"; fi for linux_version in $linux_versions; do install_dir=$HOME/spdy-chrome-canary/$linux_version if mkdir -p $install_dir; then echo \"Directory: \\\"$install_dir\\\" made or already existed\" else echo \"$install_dir exists, but is not a directory.\" echo \"Please remove whatever is there so this script can proceed next time.\" exit 128 fi pushd $install_dir install -d chrome-linux-old mv chrome-linux chrome-linux-old/chrome-linux-`date +\"%F-%k-%M-%S-%N\"` rm -rf chrome-linux chrome-linux-old chrome-linux.zip wget http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip unzip chrome-linux.zip rm -rf chrome-linux.zip popd filename_base=SPDY-Chrome-$linux_version cat \u0026gt;\u0026gt; $HOME/Desktop/$filename_base.desktop \u0026lt;\u0026lt;-EOF [Desktop Entry] Version=1.0 Encoding=UTF-8 Name=$filename_base Categories=Application;Network;WebBrowser; Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base %U Icon=/tmp/chrome-linux/product_logo_48.png MimeType=text/html;text/xml; Terminal=false Type=Application EOF filename_base=SPDY-Chrome-local-server-$linux_version cat \u0026gt;\u0026gt; $HOME/Desktop/$filename_base.desktop \u0026lt;\u0026lt;-EOF [Desktop Entry] Version=1.0 Encoding=UTF-8 Name=$filename_base Categories=Application;Network;WebBrowser; Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules='MAP * localhost' --testing-fixed-http-port=10040 --testing-fixed-https-port=10040 %U Icon=/tmp/chrome-linux/product_logo_48.png MimeType=text/html;text/xml; Terminal=false Type=Application EOF filename_base=NO-SPDY-Chrome-local-server-$linux_version cat \u0026gt;\u0026gt; $HOME/Desktop/$filename_base.desktop \u0026lt;\u0026lt;-EOF [Desktop Entry] Version=1.0 Encoding=UTF-8 Name=$filename_base Categories=Application;Network;WebBrowser; Exec=$install_dir/chrome-linux/chrome --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules='MAP * localhost' --testing-fixed-http-port=16002 --testing-fixed-https-port=16002 %U Icon=/tmp/chrome-linux/product_logo_48.png MimeType=text/html;text/xml; Terminal=false Type=Application EOF done ","wordCount":"989","inLanguage":"en","datePublished":"2010-03-31T00:00:00Z","dateModified":"2010-03-31T00:00:00Z","author":{"@type":"Person","name":"Saman Barghi"},"mainEntityOfPage":{"@type":"WebPage","@id":"http://samanbarghi.com/2010/03/31/spdy-installation/"},"publisher":{"@type":"Organization","name":"Saman Barghi","logo":{"@type":"ImageObject","url":"http://samanbarghi.com/images/favicon/favicon.ico"}}}</script></head><body id=top><script>localStorage.getItem("pref-theme")==="dark"?document.body.classList.add("dark"):localStorage.getItem("pref-theme")==="light"?document.body.classList.remove("dark"):window.matchMedia("(prefers-color-scheme: dark)").matches&&document.body.classList.add("dark")</script><header class=header><nav class=nav><div class=logo><a href=http://samanbarghi.com/ accesskey=h title="Home (Alt + H)"><img src=http://samanbarghi.com/images/favicon/apple-touch-icon.png alt aria-label=logo height=35>Home</a><div class=logo-switches><button id=theme-toggle accesskey=t title="(Alt + T)"><svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg><svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24" fill="none" stroke="currentcolor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></button></div></div><ul id=menu><li><a href=http://samanbarghi.com/about/ title=about><span>about</span></a></li><li><a href=http://samanbarghi.com/projects/ title=projects><span>projects</span></a></li><li><a href=http://samanbarghi.com/categories/ title=categories><span>categories</span></a></li><li><a href=http://samanbarghi.com/tags/ title=tags><span>tags</span></a></li></ul></nav></header><main class=main><article class=post-single><header class=post-header><div class=breadcrumbs><a href=http://samanbarghi.com/>Home</a>&nbsp;»&nbsp;<a href=http://samanbarghi.com/post/>Posts</a></div><h1 class=post-title>SPDY installation</h1><div class=post-meta><span title='2010-03-31 00:00:00 +0000 UTC'>March 31, 2010</span>&nbsp;·&nbsp;5 min&nbsp;·&nbsp;989 words&nbsp;·&nbsp;Saman Barghi&nbsp;|&nbsp;<a href=https://github.com/samanbarghi/samanbarghi-hugo/tree/master/content/post/2010-03-31-spdy-installation.md rel="noopener noreferrer" target=_blank>Suggest Changes</a></div></header><div class=post-content><p>I am taking a course called “Latency in Communication Systems” taught by Martin Karsten in University of Waterloo. We talked about different aspects of latency in communication systems, there were some lectures from industry (Sandvine, TD Securites, RIM, and SUN/Oracle) about what were the different problems they were facing during their system implementation. I had also presented two papers on profiling and router performance during the course. My course project is the reason I am writing this post, I have to install and evaluate SPDY. SPDY is a new application-layer protocol designed by Google to replace HTTP in order to make the web faster. It offers multiple requests per connection, server-initiated requests along with the client-initiated requests, header and data compression over SSL. In this post I am not going to talk about SPDY and it’s features, I will explain the process of SPDY client (chromium) and server installation as I need them later to evaluate this protocol.</p><h2 id=install-chromium>Install Chromium<a hidden class=anchor aria-hidden=true href=#install-chromium>#</a></h2><p>Edit: Follow the build instruction for linux here: <a href=http://code.google.com/p/chromium/wiki/LinuxBuildInstructions>http://code.google.com/p/chromium/wiki/LinuxBuildInstructions</a></p><p>I started to compile chromium on Ubuntu Karmic Koala 9.10. The obvious place to start is the chromium website, Although take a look at this, we need to enable data recording to cache some data for the in-memory server, I will explain this later. These are the required step to take :</p><ol><li><p>Install all the prerequisites</p></li><li><p>Download the source tarball from here.</p></li><li><p>Extract it to a location (It should not include any spaces). I extracted it to ~/chromium</p></li><li><p>Install depot_tools</p><ol><li><p><code>svn co http://src.chromium.org/svn/trunk/tools/depot_tools</code></p></li><li><p>Add depot_tools to your PATH:
+<code>$ export PATH=`pwd`/depot_tools:"$PATH"</code></p></li></ol></li><li><p>Updating your checkout once by running <code>gclient sync --force</code></p><p>in the source code directory (~/chromium/src). It is important to include the ‘–force’ option as I was getting this message:</p><p><code>make: *** No rule to make target `third_party/yasm/source/patched-yasm/ modules/arch/x86/gen_x86_insn.py', needed by `out/Debug/obj/gen/ third_party/yasm/x86insns.c'. Stop."</code></p><p>over and over again since I forgot to include the &ndash;force option. It seems that this command generate platform-specific files</p><ul><li><p><strong>Important:</strong> ensure that you have GYP_GENERATORS=make in your environment before running gclient sync or gclient runhooks &ndash;force. This tells the Chromium build system to output Makefiles. Example: <code>export GYP_GENERATORS=make gclient sync</code></p></li><li><p>Take this step only if you want to record data to be used by flip-server, if you just want to compile and run chromium skip this step and go to step 9. Modify the file chrome/common/chrome_constants.cc - change the line which reads <code>kRecordModeEnabled = false</code></p><p>to</p><p><code>kRecordModeEnabled = true</code></p></li><li><p>Go to the source directory and write (if you are using a multiple-core machine use -jX, where X is the number of make processes to startup): <code>make chrome</code></p></li><li><p>You can find the executable in src/out/Debug/chrome
+Now you should be able to run chrome with no problem.</p></li></ul><h2 id=install-flip-server>Install flip-server<a hidden class=anchor aria-hidden=true href=#install-flip-server>#</a></h2><p>To install flip-server, take a look at this. Go to the Chromuim src directory, and here are the steps that I took to install flip server:</p><ol><li>If you don’t already have a test key.pem and certificate.pem, you can generate one like so:</li></ol></li></ol><pre tabindex=0><code>openssl genrsa -out key.pem 1024
 openssl req -new -key key.pem -out request.pem  #and answer the questions at the prompt with whatever
 openssl x509 -req -days 30 -in request.pem -signkey key.pem -out cert.pem
-</code></pre></li>
+</code></pre><pre><code>2.  Get the patch from: &lt;http://codereview.chromium.org/1566013&gt;, Click the &amp;#8216;download raw patch&amp;#8217; link and save. Assuming you&amp;#8217;re in the &lt;tt&gt;chromium/src&lt;/tt&gt; directory, type: ``patch -p0 &lt; filename_of_the_patch_you_just_downloaded``
 
-<li><p>Get the patch from: <a href="http://codereview.chromium.org/1566013">http://codereview.chromium.org/1566013</a>, Click the &#8216;download raw patch&#8217; link and save. Assuming you&#8217;re in the <tt>chromium/src</tt> directory, type: <code>patch -p0 &lt; filename_of_the_patch_you_just_downloaded</code></p></li>
+3.  Find the commented-out-section in net.gyp (look for &amp;#8216;flip\_in\_mem\_edsm\_server&amp;#8221;) and uncomment it.
+4.  You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you&amp;#8217;ve done all that, you do: ``make out/Debug/flip_in_mem_edsm_server ``
 
-<li><p>Find the commented-out-section in net.gyp (look for &#8216;flip_in_mem_edsm_server&#8221;) and uncomment it.</p></li>
-
-<li><p>You will need to install the openssl libraries. The exact packages depend on your linux distribution (but will be named something like ssl-dev or openssl-dev, or in ubuntu libssl-dev), so watch the error messages, if any. After you&#8217;ve done all that, you do: <code>make out/Debug/flip_in_mem_edsm_server</code></p></li>
-
-<li><p>I had to change these lines to get rid of some compiling errors :</p>
-
-<ul>
-<li><p>While compiling I got :</p>
-
-<pre><code>/usr/include/linux/tcp.h:72: error: '__u32 __fswab32(__u32)' cannot
+5.  I had to change these lines to get rid of some compiling errors :
+    *   While compiling I got :
+</code></pre><pre tabindex=0><code>/usr/include/linux/tcp.h:72: error: &#39;__u32 __fswab32(__u32)&#39; cannot
 appear in a constant-expression
 /usr/include/linux/tcp.h:72: error: a function call cannot appear in a
 constant-expression
-/usr/include/linux/tcp.h:73: error: '__u32 __fswab32(__u32)' cannot
+/usr/include/linux/tcp.h:73: error: &#39;__u32 __fswab32(__u32)&#39; cannot
 appear in a constant-expression
 /usr/include/linux/tcp.h:73: error: a function call cannot appear in a
 constant-expression
-</code></pre>
+</code></pre><pre><code>        To fix it, in file &lt;tt&gt;src/net/tools/flip_server/flip_in_mem_edsm_server.cc&lt;/tt&gt; change the line that reads:
 
-<p>To fix it, in file <tt>src/net/tools/flip_server/flip_in_mem_edsm_server.cc</tt> change the line that reads:</p>
+        &lt;pre class=&quot;brush: plain; light: true; title: ; notranslate&quot; title=&quot;&quot;&gt;#include &amp;lt;linux/tcp.h&amp;gt;&lt;/pre&gt;
 
-<pre class="brush: plain; light: true; title: ; notranslate" title="">#include &lt;linux/tcp.h&gt;</pre>
+        to
 
-<p>to</p>
+        &lt;pre class=&quot;brush: plain; light: true; title: ; notranslate&quot; title=&quot;&quot;&gt;#include &amp;lt;netinet/tcp.h&amp;gt;&lt;/pre&gt;
 
-<pre class="brush: plain; light: true; title: ; notranslate" title="">#include &lt;netinet/tcp.h&gt;</pre></li>
+    *   In the same file change : &lt;pre class=&quot;brush: plain; light: true; title: ; notranslate&quot; title=&quot;&quot;&gt;state-&amp;gt;ssl_method = SSLv23_method();&lt;/pre&gt;
 
-<li><p>In the same file change : <pre class="brush: plain; light: true; title: ; notranslate" title="">state-&gt;ssl_method = SSLv23_method();</pre></p>
+        to
 
-<p>to</p>
+        &lt;pre class=&quot;brush: plain; light: true; title: ; notranslate&quot; title=&quot;&quot;&gt;state-&amp;gt;ssl_method = const_cast&amp;lt;SSL_METHOD *&amp;gt; (SSLv23_method()); &lt;/pre&gt;
 
-<pre class="brush: plain; light: true; title: ; notranslate" title="">state-&gt;ssl_method = const_cast&lt;SSL_METHOD *&gt; (SSLv23_method()); </pre></li>
+    *   I was getting some errors related to &lt;tt&gt;printSslError &lt;/tt&gt; function in &lt;tt&gt;flip_in_mem_edsm_server.cc&lt;/tt&gt;, it seems that this function prints out the errors related to SSL encryption, since I did not need that I commented the contents of the function out.
 
-<li><p>I was getting some errors related to <tt>printSslError </tt> function in <tt>flip_in_mem_edsm_server.cc</tt>, it seems that this function prints out the errors related to SSL encryption, since I did not need that I commented the contents of the function out.</p></li>
-</ul></li>
-</ol>
+## Install Chrome which is able to talk to localhost server
 
-<h2 id="install-chrome-which-is-able-to-talk-to-localhost-server:9b6dd0bb85defcc32bbe025166e81019">Install Chrome which is able to talk to localhost server</h2>
+Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run &lt;tt&gt;bash filename&lt;/tt&gt;:
+</code></pre><pre tabindex=0><code>#!/bin/bash
 
-<p>Now if you want a quick chrome installation that is able to talk to your installed server on localhost you need to copy the following script, save it in a file and run <tt>bash filename</tt>:</p></li>
-</ol>
-
-<pre><code>#!/bin/bash
-
-if [ &quot;$(dpkg --print-architecture)&quot; == &quot;amd64&quot; ]; then
-  echo -ne &quot;\n\nYou have a 64 bit computer\n\n&quot;
-  linux_versions=&quot;linux64&quot;;
+if [ &#34;$(dpkg --print-architecture)&#34; == &#34;amd64&#34; ]; then
+  echo -ne &#34;\n\nYou have a 64 bit computer\n\n&#34;
+  linux_versions=&#34;linux64&#34;;
 else
-  echo -ne &quot;\n\nYou have a 32 bit computer\n\n&quot;
-  linux_versions=&quot;linux&quot;;
+  echo -ne &#34;\n\nYou have a 32 bit computer\n\n&#34;
+  linux_versions=&#34;linux&#34;;
 fi
 
 for linux_version in $linux_versions; do
   install_dir=$HOME/spdy-chrome-canary/$linux_version
 
   if mkdir -p $install_dir; then
-    echo &quot;Directory: \&quot;$install_dir\&quot; made or already existed&quot;
+    echo &#34;Directory: \&#34;$install_dir\&#34; made or already existed&#34;
   else
-      echo &quot;$install_dir exists, but is not a directory.&quot;
-      echo &quot;Please remove whatever is there so this script can proceed next time.&quot;
+      echo &#34;$install_dir exists, but is not a directory.&#34;
+      echo &#34;Please remove whatever is there so this script can proceed next time.&#34;
       exit 128
   fi
 
   pushd $install_dir
 
   install -d chrome-linux-old
-  mv chrome-linux chrome-linux-old/chrome-linux-`date +&quot;%F-%k-%M-%S-%N&quot;`
+  mv chrome-linux chrome-linux-old/chrome-linux-`date +&#34;%F-%k-%M-%S-%N&#34;`
   rm -rf chrome-linux chrome-linux-old chrome-linux.zip
   wget http://build.chromium.org/buildbot/continuous/$linux_version/LATEST/chrome-linux.zip
   unzip chrome-linux.zip
@@ -263,7 +91,7 @@ Version=1.0
 Encoding=UTF-8
 Name=$filename_base
 Categories=Application;Network;WebBrowser;
-Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules='MAP * localhost' --testing-fixed-http-port=10040 --testing-fixed-https-port=10040 %U
+Exec=$install_dir/chrome-linux/chrome --use-spdy --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules=&#39;MAP * localhost&#39; --testing-fixed-http-port=10040 --testing-fixed-https-port=10040 %U
 Icon=/tmp/chrome-linux/product_logo_48.png
 MimeType=text/html;text/xml;
 Terminal=false
@@ -277,7 +105,7 @@ Version=1.0
 Encoding=UTF-8
 Name=$filename_base
 Categories=Application;Network;WebBrowser;
-Exec=$install_dir/chrome-linux/chrome --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules='MAP * localhost' --testing-fixed-http-port=16002 --testing-fixed-https-port=16002 %U
+Exec=$install_dir/chrome-linux/chrome --enable-logging --log-level=0 --user-data-dir=.$filename_base --host-resolver-rules=&#39;MAP * localhost&#39; --testing-fixed-http-port=16002 --testing-fixed-https-port=16002 %U
 Icon=/tmp/chrome-linux/product_logo_48.png
 MimeType=text/html;text/xml;
 Terminal=false
@@ -285,38 +113,8 @@ Type=Application
 EOF
 
 done
-</code></pre>
-
-  </div>
-  <div id="disqus_thread"></div>
-</div>
-
-
-<script type="text/javascript">
-var disqus_shortname = "samanbarghi";
-(function () {
-    var s = document.createElement('script'); s.async = true;
-    s.type = 'text/javascript';
-    s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-    (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-}());
-</script>
-
-
-
-<script type="text/javascript">
-    var disqus_shortname = "samanbarghi";
-    (function() {
-        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
-        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    })();
-</script>
-<noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-<a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
-
-<script src="http://samanbarghi.com/js/highlight.pack.js"></script>
-<script>hljs.initHighlightingOnLoad();</script>
-</body>
-</html>
-
+</code></pre></div><footer class=post-footer><ul class=post-tags></ul><nav class=paginav><a class=prev href=http://samanbarghi.com/2010/04/12/see-id/><span class=title>« Prev</span><br><span>See ID</span></a>
+<a class=next href=http://samanbarghi.com/2010/03/16/the-power-of-options/><span class=title>Next »</span><br><span>The power of options</span></a></nav><div class=share-buttons><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on twitter" href="https://twitter.com/intent/tweet/?text=SPDY%20installation&url=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f&hashtags="><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM195.519 424.544c135.939.0 210.268-112.643 210.268-210.268.0-3.218.0-6.437-.153-9.502 14.406-10.421 26.973-23.448 36.935-38.314-13.18 5.824-27.433 9.809-42.452 11.648 15.326-9.196 26.973-23.602 32.49-40.92-14.252 8.429-30.038 14.56-46.896 17.931-13.487-14.406-32.644-23.295-53.946-23.295-40.767.0-73.87 33.104-73.87 73.87.0 5.824.613 11.494 1.992 16.858-61.456-3.065-115.862-32.49-152.337-77.241-6.284 10.881-9.962 23.601-9.962 37.088.0 25.594 13.027 48.276 32.95 61.456-12.107-.307-23.448-3.678-33.41-9.196v.92c0 35.862 25.441 65.594 59.311 72.49-6.13 1.686-12.72 2.606-19.464 2.606-4.751.0-9.348-.46-13.946-1.38 9.349 29.426 36.628 50.728 68.965 51.341-25.287 19.771-57.164 31.571-91.8 31.571-5.977.0-11.801-.306-17.625-1.073 32.337 21.15 71.264 33.41 112.95 33.41z"/></svg></a><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on linkedin" href="https://www.linkedin.com/shareArticle?mini=true&url=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f&title=SPDY%20installation&summary=SPDY%20installation&source=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM160.461 423.278V197.561h-75.04v225.717h75.04zm270.539.0V293.839c0-69.333-37.018-101.586-86.381-101.586-39.804.0-57.634 21.891-67.617 37.266v-31.958h-75.021c.995 21.181.0 225.717.0 225.717h75.02V297.222c0-6.748.486-13.492 2.474-18.315 5.414-13.475 17.767-27.434 38.494-27.434 27.135.0 38.007 20.707 38.007 51.037v120.768H431zM123.448 88.722C97.774 88.722 81 105.601 81 127.724c0 21.658 16.264 39.002 41.455 39.002h.484c26.165.0 42.452-17.344 42.452-39.002-.485-22.092-16.241-38.954-41.943-39.002z"/></svg></a><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on reddit" href="https://reddit.com/submit?url=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f&title=SPDY%20installation"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zM446 265.638c0-22.964-18.616-41.58-41.58-41.58-11.211.0-21.361 4.457-28.841 11.666-28.424-20.508-67.586-33.757-111.204-35.278l18.941-89.121 61.884 13.157c.756 15.734 13.642 28.29 29.56 28.29 16.407.0 29.706-13.299 29.706-29.701.0-16.403-13.299-29.702-29.706-29.702-11.666.0-21.657 6.792-26.515 16.578l-69.105-14.69c-1.922-.418-3.939-.042-5.585 1.036-1.658 1.073-2.811 2.761-3.224 4.686l-21.152 99.438c-44.258 1.228-84.046 14.494-112.837 35.232-7.468-7.164-17.589-11.591-28.757-11.591-22.965.0-41.585 18.616-41.585 41.58.0 16.896 10.095 31.41 24.568 37.918-.639 4.135-.99 8.328-.99 12.576.0 63.977 74.469 115.836 166.33 115.836s166.334-51.859 166.334-115.836c0-4.218-.347-8.387-.977-12.493 14.564-6.47 24.735-21.034 24.735-38.001zM326.526 373.831c-20.27 20.241-59.115 21.816-70.534 21.816-11.428.0-50.277-1.575-70.522-21.82-3.007-3.008-3.007-7.882.0-10.889 3.003-2.999 7.882-3.003 10.885.0 12.777 12.781 40.11 17.317 59.637 17.317 19.522.0 46.86-4.536 59.657-17.321 3.016-2.999 7.886-2.995 10.885.008 3.008 3.011 3.003 7.882-.008 10.889zm-5.23-48.781c-16.373.0-29.701-13.324-29.701-29.698.0-16.381 13.328-29.714 29.701-29.714 16.378.0 29.706 13.333 29.706 29.714.0 16.374-13.328 29.698-29.706 29.698zM160.91 295.348c0-16.381 13.328-29.71 29.714-29.71 16.369.0 29.689 13.329 29.689 29.71.0 16.373-13.32 29.693-29.689 29.693-16.386.0-29.714-13.32-29.714-29.693z"/></svg></a><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on facebook" href="https://facebook.com/sharer/sharer.php?u=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H342.978V319.085h66.6l12.672-82.621h-79.272v-53.617c0-22.603 11.073-44.636 46.58-44.636H425.6v-70.34s-32.71-5.582-63.982-5.582c-65.288.0-107.96 39.569-107.96 111.204v62.971h-72.573v82.621h72.573V512h-191.104c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892z"/></svg></a><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on whatsapp" href="https://api.whatsapp.com/send?text=SPDY%20installation%20-%20http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f"><svg viewBox="0 0 512 512" height="30" width="30" fill="currentcolor"><path d="M449.446.0C483.971.0 512 28.03 512 62.554v386.892C512 483.97 483.97 512 449.446 512H62.554c-34.524.0-62.554-28.03-62.554-62.554V62.554c0-34.524 28.029-62.554 62.554-62.554h386.892zm-58.673 127.703c-33.842-33.881-78.847-52.548-126.798-52.568-98.799.0-179.21 80.405-179.249 179.234-.013 31.593 8.241 62.428 23.927 89.612l-25.429 92.884 95.021-24.925c26.181 14.28 55.659 21.807 85.658 21.816h.074c98.789.0 179.206-80.413 179.247-179.243.018-47.895-18.61-92.93-52.451-126.81zM263.976 403.485h-.06c-26.734-.01-52.954-7.193-75.828-20.767l-5.441-3.229-56.386 14.792 15.05-54.977-3.542-5.637c-14.913-23.72-22.791-51.136-22.779-79.287.033-82.142 66.867-148.971 149.046-148.971 39.793.014 77.199 15.531 105.329 43.692 28.128 28.16 43.609 65.592 43.594 105.4-.034 82.149-66.866 148.983-148.983 148.984zm81.721-111.581c-4.479-2.242-26.499-13.075-30.604-14.571-4.105-1.495-7.091-2.241-10.077 2.241-2.986 4.483-11.569 14.572-14.182 17.562-2.612 2.988-5.225 3.364-9.703 1.12-4.479-2.241-18.91-6.97-36.017-22.23C231.8 264.15 222.81 249.484 220.198 245s-.279-6.908 1.963-9.14c2.016-2.007 4.48-5.232 6.719-7.847 2.24-2.615 2.986-4.484 4.479-7.472 1.493-2.99.747-5.604-.374-7.846-1.119-2.241-10.077-24.288-13.809-33.256-3.635-8.733-7.327-7.55-10.077-7.688-2.609-.13-5.598-.158-8.583-.158-2.986.0-7.839 1.121-11.944 5.604-4.105 4.484-15.675 15.32-15.675 37.364.0 22.046 16.048 43.342 18.287 46.332 2.24 2.99 31.582 48.227 76.511 67.627 10.685 4.615 19.028 7.371 25.533 9.434 10.728 3.41 20.492 2.929 28.209 1.775 8.605-1.285 26.499-10.833 30.231-21.295 3.732-10.464 3.732-19.431 2.612-21.298-1.119-1.869-4.105-2.99-8.583-5.232z"/></svg></a><a target=_blank rel="noopener noreferrer" aria-label="share SPDY installation on telegram" href="https://telegram.me/share/url?text=SPDY%20installation&url=http%3a%2f%2fsamanbarghi.com%2f2010%2f03%2f31%2fspdy-installation%2f"><svg viewBox="2 2 28 28" height="30" width="30" fill="currentcolor"><path d="M26.49 29.86H5.5a3.37 3.37.0 01-2.47-1 3.35 3.35.0 01-1-2.47V5.48A3.36 3.36.0 013 3 3.37 3.37.0 015.5 2h21A3.38 3.38.0 0129 3a3.36 3.36.0 011 2.46V26.37a3.35 3.35.0 01-1 2.47 3.38 3.38.0 01-2.51 1.02zm-5.38-6.71a.79.79.0 00.85-.66L24.73 9.24a.55.55.0 00-.18-.46.62.62.0 00-.41-.17q-.08.0-16.53 6.11a.59.59.0 00-.41.59.57.57.0 00.43.52l4 1.24 1.61 4.83a.62.62.0 00.63.43.56.56.0 00.4-.17L16.54 20l4.09 3A.9.9.0 0021.11 23.15zM13.8 20.71l-1.21-4q8.72-5.55 8.78-5.55c.15.0.23.0.23.16a.18.18.0 010 .06s-2.51 2.3-7.52 6.8z"/></svg></a></div></footer></article></main><footer class=footer><span>&copy; 2023 <a href=http://samanbarghi.com/>Saman Barghi</a></span>
+<span>Powered by
+<a href=https://gohugo.io/ rel="noopener noreferrer" target=_blank>Hugo</a> &
+        <a href=https://github.com/adityatelange/hugo-PaperMod/ rel=noopener target=_blank>PaperMod</a></span></footer><a href=#top aria-label="go to top" title="Go to Top (Alt + G)" class=top-link id=top-link accesskey=g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentcolor"><path d="M12 6H0l6-6z"/></svg></a><script>let menu=document.getElementById("menu");menu&&(menu.scrollLeft=localStorage.getItem("menu-scroll-position"),menu.onscroll=function(){localStorage.setItem("menu-scroll-position",menu.scrollLeft)}),document.querySelectorAll('a[href^="#"]').forEach(e=>{e.addEventListener("click",function(e){e.preventDefault();var t=this.getAttribute("href").substr(1);window.matchMedia("(prefers-reduced-motion: reduce)").matches?document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView():document.querySelector(`[id='${decodeURIComponent(t)}']`).scrollIntoView({behavior:"smooth"}),t==="top"?history.replaceState(null,null," "):history.pushState(null,null,`#${t}`)})})</script><script>var mybutton=document.getElementById("top-link");window.onscroll=function(){document.body.scrollTop>800||document.documentElement.scrollTop>800?(mybutton.style.visibility="visible",mybutton.style.opacity="1"):(mybutton.style.visibility="hidden",mybutton.style.opacity="0")}</script><script>document.getElementById("theme-toggle").addEventListener("click",()=>{document.body.className.includes("dark")?(document.body.classList.remove("dark"),localStorage.setItem("pref-theme","light")):(document.body.classList.add("dark"),localStorage.setItem("pref-theme","dark"))})</script></body></html>

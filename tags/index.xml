@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Tags on Saman Barghi</title>
+    <link>http://samanbarghi.com/tags/</link>
+    <description>Recent content in Tags on Saman Barghi</description>
+    <image>
+      <url>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</url>
+      <link>http://samanbarghi.com/%3Clink%20or%20path%20of%20image%20for%20opengraph,%20twitter-cards%3E</link>
+    </image>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 11 Jan 2011 00:00:00 +0000</lastBuildDate><atom:link href="http://samanbarghi.com/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>facebook</title>
+      <link>http://samanbarghi.com/tags/facebook/</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/facebook/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>hack</title>
+      <link>http://samanbarghi.com/tags/hack/</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/hack/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>notes</title>
+      <link>http://samanbarghi.com/tags/notes/</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/notes/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>qualification</title>
+      <link>http://samanbarghi.com/tags/qualification/</link>
+      <pubDate>Tue, 11 Jan 2011 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/qualification/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>emotions</title>
+      <link>http://samanbarghi.com/tags/emotions/</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/emotions/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Observations</title>
+      <link>http://samanbarghi.com/tags/observations/</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/observations/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>observations trust</title>
+      <link>http://samanbarghi.com/tags/observations-trust/</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/observations-trust/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rationality</title>
+      <link>http://samanbarghi.com/tags/rationality/</link>
+      <pubDate>Mon, 12 Apr 2010 00:00:00 +0000</pubDate>
+      
+      <guid>http://samanbarghi.com/tags/rationality/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
